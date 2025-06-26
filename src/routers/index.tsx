@@ -1,0 +1,41 @@
+import { Route, Routes } from "react-router-dom";
+// ** LandingPages Components
+import LandingPageLayout from "../Layout/LandingPageLayout";
+import Home from "../pages/LandingPages/Home";
+import AboutUs from "../pages/LandingPages/AboutUs";
+import Features from "../pages/LandingPages/Features";
+import HowItWorks from "../pages/LandingPages/HowItWorks";
+import FuturePlans from "../pages/LandingPages/FuturePlans";
+import IsAdmin from "../pages/IsAdmin";
+// ** AdminPages Components
+import AdminLayout from "../Layout/AdminLayout";
+import HomeAdmin from "../pages/AdminPages/HomeAdmin";
+import Statistics from "../pages/AdminPages/Statistics";
+import OrdersManagement from "../pages/AdminPages/OrdersManagement";
+import ServiceProviders from "../pages/AdminPages/ServiceProviders";
+
+
+export default function Routers() {
+  return (
+    <>
+      <Routes>
+        {/* LandingPage layout */}
+        <Route path="/" element={<LandingPageLayout />}>
+          <Route index element={<Home />} />
+          <Route path="about-us" element={<AboutUs />} />
+          <Route path="features" element={<Features />} />
+          <Route path="how-it-works" element={<HowItWorks />} />
+          <Route path="future-plans" element={<FuturePlans />} />
+          <Route path="is-admin" element={<IsAdmin />} />
+        </Route>
+        {/* AdminLayout */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<HomeAdmin />} />
+          <Route path="statistics" element={<Statistics />} />
+          <Route path="orders-management" element={<OrdersManagement />} />
+          <Route path="service-providers" element={<ServiceProviders />} />
+        </Route>
+      </Routes>
+    </>
+  );
+}

@@ -1,0 +1,120 @@
+/* Start Variables */
+:root {
+  /* Primary Brand Colors */
+  --main-color: #dc747d;
+  --main-color-light: #fbeaec;
+  --main-color-dark: #b85a62;
+
+  /* Secondary / Neutral Colors */
+  --secondary-color: #f0f0f0;
+  --text-color: #333;
+  --text-light: #666;
+  --bg-color: #ffffff;
+  --bg-alt-color: #f9f9f9;
+
+  /* Shadow & Border */
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --border-radius: 10px;
+}
+/* End Variables */
+
+.navbarContainer {
+  background: var(--main-color);
+  color: white;
+  font-family: var(--font-main);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  height: 90px;
+  background-color: var(--main-color);
+  box-shadow: var(--box-shadow);
+}
+
+.logo img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.navLinks {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.navLinks li a {
+  color: white;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s ease;
+  font-family: var(--font-main);
+}
+
+.navLinks li a::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  background: white;
+  transition: width 0.3s;
+}
+
+.navLinks li a:hover::after {
+  width: 100%;
+}
+
+.active {
+  font-weight: bold;
+  border-bottom: 2px solid white;
+}
+
+.menuToggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: white;
+  cursor: pointer;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .navLinks {
+    position: absolute;
+    top: 99px;
+    right: 36px;
+    background-color: rgba(0, 0, 0, 0.9);
+    flex-direction: column;
+    align-items: flex-start;
+    width: 85%;
+    padding: 1rem;
+    display: none;
+    border-radius: 8px 8px 8px 8px;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+  }
+  .open {
+    display: flex;
+  }
+
+  .menuToggle {
+    display: block;
+  }
+
+  .navLinks li {
+    padding: 0.5rem 0;
+    width: 100%;
+  }
+
+  .navLinks li a {
+    width: 100%;
+  }
+}

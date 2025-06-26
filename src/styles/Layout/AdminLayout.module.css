@@ -1,0 +1,72 @@
+/* Start Variables */
+:root {
+  /* Primary Brand Colors */
+  --main-color: #dc747d;
+  --main-color-light: #fbeaec;
+  --main-color-dark: #b85a62;
+
+  /* Secondary / Neutral Colors */
+  --secondary-color: #f0f0f0;
+  --text-color: #333;
+  --text-light: #666;
+  --bg-color: #ffffff;
+  --bg-alt-color: #f9f9f9;
+
+  /* Shadow & Border */
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --border-radius: 10px;
+}
+/* End Variables */
+
+
+.adminLayout {
+  display: flex;
+}
+
+.adminLayout_container {
+  width: 15%;
+  height: 100vh;
+  background-color: var(--bg-color);
+  box-shadow: -5px 0 10px rgba(0, 0, 0, 0.1);
+}
+.logo_shayyall{
+  transform: translate(-50%, 0);
+}
+
+.adminLayout_container > img {
+  margin: 16px 0;
+  cursor: pointer;
+}
+
+.adminLayout_content {
+  padding: 1rem;
+}
+
+.adminLayout_content div {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: var(--border-radius);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  color: var(--text-color);
+}
+.adminLayout_content div img{
+  width: 24px;
+  height: 24px;
+}
+.adminLayout_content div:hover {
+  background-color: var(--main-color-light);
+}
+
+/* Active Class */
+.active {
+  background-color: var(--main-color);
+  color: white;
+}
+
+.active p {
+  color: white;
+}

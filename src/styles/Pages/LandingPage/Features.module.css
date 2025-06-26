@@ -1,0 +1,97 @@
+/* Start Variables */
+:root {
+  /* Primary Brand Colors */
+  --main-color: #dc747d;
+  --main-color-light: #fbeaec;
+  --main-color-dark: #b85a62;
+
+  /* Secondary / Neutral Colors */
+  --secondary-color: #f0f0f0;
+  --text-color: #333;
+  --text-light: #666;
+  --bg-color: #ffffff;
+  --bg-alt-color: #f9f9f9;
+
+  /* Shadow & Border */
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --border-radius: 10px;
+}
+/* End Variables */
+.featuresSection {
+  padding: 4rem 1.5rem;
+  background: linear-gradient(
+    to bottom,
+    var(--bg-color),
+    var(--main-color-light)
+  );
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+}
+
+.container {
+  max-width: 1000px;
+  width: 100%;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: var(--main-color);
+  font-weight: bold;
+  margin-bottom: 2.5rem;
+}
+
+.title span {
+  color: var(--text-color);
+}
+
+.featuresList {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.featureItem {
+  background-color: var(--bg-color);
+  padding: 1.5rem 1.2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  font-size: 1.1rem;
+  text-align: right;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  line-height: 1.7;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeUp 0.6s forwards;
+}
+
+.bullet {
+  color: var(--main-color);
+  font-weight: bold;
+  font-size: 1.4rem;
+  margin-top: 0.1rem;
+}
+
+/* Animation */
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .featureItem {
+    font-size: 1rem;
+    padding: 1rem;
+  }
+}
