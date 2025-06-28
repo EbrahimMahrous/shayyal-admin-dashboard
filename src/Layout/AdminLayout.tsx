@@ -18,7 +18,9 @@ export default function AdminLayout() {
   return (
     <div className={style.adminLayout}>
       <div className={style.adminLayout_container}>
-        <img className={style.logo_shayyall} src={logo} alt="logo" />
+        <div className= {style.logo_shayyall_container}>
+          <img className={style.logo_shayyall} src={logo} alt="logo" />
+        </div>
 
         <div className={style.adminLayout_content}>
           <div

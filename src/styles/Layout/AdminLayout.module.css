@@ -29,8 +29,10 @@
   background-color: var(--bg-color);
   box-shadow: -5px 0 10px rgba(0, 0, 0, 0.1);
 }
-.logo_shayyall{
-  transform: translate(-50%, 0);
+.logo_shayyall_container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .adminLayout_container > img {

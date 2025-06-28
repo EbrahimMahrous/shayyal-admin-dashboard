@@ -3,7 +3,7 @@ import Routers from "../src/routers";
 
 export default function App() {
   return (
-    <Router>
+    <Router basename="/shayyal-admin-dashboard/">
       <Routers />
     </Router>
   );

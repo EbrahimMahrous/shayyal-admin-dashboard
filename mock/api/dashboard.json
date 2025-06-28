@@ -1,0 +1,29 @@
+{
+  "dashboard": {
+    "users": 76,
+    "orders": 134,
+    "providers": 25,
+    "sales": 13500,
+    "ordersPerMonth": [
+      { "month": "يناير", "count": 30 },
+      { "month": "فبراير", "count": 45 },
+      { "month": "مارس", "count": 28 },
+      { "month": "أبريل", "count": 60 },
+      { "month": "مايو", "count": 50 },
+      { "month": "يونيو", "count": 40 }
+    ],
+    "newUsers": [
+      { "month": "يناير", "count": 12 },
+      { "month": "فبراير", "count": 20 },
+      { "month": "مارس", "count": 18 },
+      { "month": "أبريل", "count": 25 },
+      { "month": "مايو", "count": 30 },
+      { "month": "يونيو", "count": 28 }
+    ],
+    "orderStatus": [
+      { "label": "جديدة", "value": 40 },
+      { "label": "قيد التنفيذ", "value": 30 },
+      { "label": "منتهية", "value": 30 }
+    ]
+  }
+}
