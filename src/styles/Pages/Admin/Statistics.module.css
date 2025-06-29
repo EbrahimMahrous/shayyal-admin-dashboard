@@ -17,7 +17,6 @@
   --border-radius: 10px;
 }
 /* End Variables */
-
 .container {
   padding: 2rem;
   width: 100%;
@@ -41,29 +40,13 @@
   margin-bottom: 1.5rem;
   color: var(--main-color-dark);
 }
-
 /* filters */
 .filtersWrapper {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  /* margin-bottom: 2rem; */
   align-items: center;
 }
-/* .filtersWrapper {
-  position: sticky;
-  top: 0;
-  z-index: 100; 
-  background-color: white; 
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1rem; 
-  margin-bottom: 2rem;
-  align-items: center;
-  border-bottom: 1px solid #ddd; 
-} */
-
 .select,
 .searchInput {
   padding: 0.9rem 2rem;
@@ -84,12 +67,10 @@ option:hover {
   border-color: var(--main-color-light);
   box-shadow: 0 0 0 2px rgba(220, 116, 125, 0.15);
 }
-
 .select:hover,
 .searchInput:hover {
   border-color: var(--main-color-light);
 }
-
 .resetBtn {
   background-color: var(--main-color);
   color: white;
@@ -100,18 +81,15 @@ option:hover {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
 .resetBtn:hover {
   background-color: var(--main-color-dark);
 }
-
 /* Card */
 .summaryGrid {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
 }
-
 .card {
   flex: 1;
   background: var(--bg-color);
@@ -138,7 +116,6 @@ option:hover {
   width: 450px;
   text-align: center;
 }
-
 .tables_container {
   display: flex;
   align-items: center;
@@ -146,20 +123,14 @@ option:hover {
   text-align: center;
   gap: 2rem;
 }
-
 .charts_content_container {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
 }
-
 .line_bar_container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-.user_map_container {
-  /* Reserved for future content */
 }

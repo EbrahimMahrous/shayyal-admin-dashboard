@@ -239,15 +239,15 @@ export default function HomeAdmin() {
 
       {/* Charts */}
       <div className={styles.charts_container}>
-        <div>
+        <div className={styles.chart_card}>
           <h3 className={styles.subheading}>الطلبات خلال الأشهر الأخيرة</h3>
           <canvas id="ordersBarChart" height="100"></canvas>
         </div>
-        <div>
+        <div className={`${styles.chart_card} ${styles.pieChart}`}>
           <h3 className={styles.subheading}>توزيع حالات الطلبات</h3>
           <canvas id="orderStatusPie" height="100"></canvas>
         </div>
-        <div>
+        <div className={styles.chart_card}>
           <h3 className={styles.subheading}>عدد المستخدمين الجدد</h3>
           <canvas id="usersLineChart" height="100"></canvas>
         </div>
