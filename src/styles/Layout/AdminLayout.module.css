@@ -18,18 +18,22 @@
 }
 /* End Variables */
 
-
 .adminLayout {
   display: flex;
 }
 
 .adminLayout_container {
   width: 15%;
-  height: 100vh;
   background-color: var(--bg-color);
   box-shadow: -5px 0 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1000;
 }
-.logo_shayyall_container{
+
+.logo_shayyall_container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +59,7 @@
   transition: background-color 0.3s ease, color 0.3s ease;
   color: var(--text-color);
 }
-.adminLayout_content div img{
+.adminLayout_content div img {
   width: 24px;
   height: 24px;
 }

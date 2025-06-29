@@ -25,5 +25,64 @@
       { "label": "قيد التنفيذ", "value": 30 },
       { "label": "منتهية", "value": 30 }
     ]
+  },
+  "statistics": {
+    "orders": [
+      { "date": "2025-06-25", "count": 20 },
+      { "date": "2025-06-26", "count": 35 },
+      { "date": "2025-06-27", "count": 40 },
+      { "date": "2025-06-28", "count": 25 }
+    ],
+    "providers": [
+      { "name": "مزود A", "orders": 120 },
+      { "name": "مزود B", "orders": 90 },
+      { "name": "مزود C", "orders": 60 }
+    ],
+    "summary": {
+      "totalOrders": 175,
+      "cancellationRate": "7.5%"
+    },
+    "recentOrders": [
+      { "id": 1001, "customer": "محمد", "service": "تنظيف", "date": "2025-06-28" },
+      { "id": 1002, "customer": "سارة", "service": "صيانة", "date": "2025-06-27" },
+      { "id": 1003, "customer": "علي", "service": "تركيب", "date": "2025-06-26" },
+      { "id": 1004, "customer": "هالة", "service": "تنظيف", "date": "2025-06-25" },
+      { "id": 1005, "customer": "خالد", "service": "صيانة", "date": "2025-06-24" },
+      { "id": 1006, "customer": "نورا", "service": "تركيب", "date": "2025-06-23" },
+      { "id": 1007, "customer": "سامر", "service": "تنظيف", "date": "2025-06-22" },
+      { "id": 1008, "customer": "ليلى", "service": "صيانة", "date": "2025-06-21" },
+      { "id": 1009, "customer": "يوسف", "service": "تركيب", "date": "2025-06-20" },
+      { "id": 1010, "customer": "مريم", "service": "تنظيف", "date": "2025-06-19" },
+      { "id": 1011, "customer": "عمر", "service": "صيانة", "date": "2025-06-18" },
+      { "id": 1012, "customer": "سميرة", "service": "تركيب", "date": "2025-06-17" },
+      { "id": 1013, "customer": "باسل", "service": "تنظيف", "date": "2025-06-16" },
+      { "id": 1014, "customer": "رنا", "service": "صيانة", "date": "2025-06-15" },
+      { "id": 1015, "customer": "فارس", "service": "تركيب", "date": "2025-06-14" }
+    ],
+    "activeUsers": [
+      { "name": "أحمد", "email": "ahmed@example.com", "lastLogin": "2025-06-27" },
+      { "name": "ليلى", "email": "laila@example.com", "lastLogin": "2025-06-28" }
+    ],
+    "topRatedProviders": [
+      { "name": "مؤسسة الراحة", "rating": 4.9, "reviews": 120 },
+      { "name": "صيانة بلس", "rating": 4.8, "reviews": 95 },
+      { "name": "النجاح للصيانة", "rating": 4.7, "reviews": 110 },
+      { "name": "الخدمة الذهبية", "rating": 4.6, "reviews": 85 },
+      { "name": "الحلول السريعة", "rating": 4.9, "reviews": 130 },
+      { "name": "المتميزون", "rating": 4.5, "reviews": 90 },
+      { "name": "الرائد للصيانة", "rating": 4.7, "reviews": 105 },
+      { "name": "المهنيون", "rating": 4.8, "reviews": 115 },
+      { "name": "الموثوق", "rating": 4.6, "reviews": 80 },
+      { "name": "الرؤية للخدمات", "rating": 4.7, "reviews": 88 },
+      { "name": "النخبة", "rating": 4.9, "reviews": 140 },
+      { "name": "التميز الأول", "rating": 4.5, "reviews": 75 },
+      { "name": "المساعدة السريعة", "rating": 4.8, "reviews": 100 },
+      { "name": "الأفضل دائماً", "rating": 4.6, "reviews": 92 },
+      { "name": "خدمة العملاء", "rating": 4.7, "reviews": 98 }
+    ],
+    "cards": [
+      { "id": 1, "title": "عدد الطلبات", "value": 120, "unit": "طلب" },
+      { "id": 2, "title": "الإجمالي", "value": 5600, "unit": "ر.س" }
+    ]
   }
 }
