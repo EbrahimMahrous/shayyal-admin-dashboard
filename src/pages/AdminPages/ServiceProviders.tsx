@@ -1,6 +1,5 @@
 // ** Style
 import styles from "../../styles/Pages/Admin/ServiceProviders.module.css";
-// ** Assets
 // ** Hooks
 import { useEffect, useState, type ChangeEvent } from "react";
 // ** Icons
@@ -16,29 +15,19 @@ interface Provider {
 export default function ServiceProviders() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [search, setSearch] = useState("");
-  const [selectedProvider, setSelectedProvider] = useState<Provider | null>(
-    null
-  );
+  const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [providerToDelete, setProviderToDelete] = useState<Provider | null>(null);
 
   useEffect(() => {
     setProviders([
-      {
-        id: 1,
-        name: "شركة النظافة الحديثة",
-        service: "تنظيف",
-        email: "clean@modern.com",
-      },
+      { id: 1, name: "شركة النظافة الحديثة", service: "تنظيف", email: "clean@modern.com" },
       { id: 2, name: "خدمات فنية", service: "صيانة", email: "fix@support.com" },
       { id: 3, name: "المهندسون", service: "هندسة", email: "eng@services.com" },
     ]);
   }, []);
-
-  const handleDelete = (id: number) => {
-    if (confirm("هل تريد حذف مزود الخدمة؟")) {
-      setProviders((prev) => prev.filter((p) => p.id !== id));
-    }
-  };
 
   const handleEdit = (provider: Provider) => {
     setSelectedProvider(provider);
@@ -60,6 +49,24 @@ export default function ServiceProviders() {
     if (selectedProvider) {
       setSelectedProvider({ ...selectedProvider, [field]: e.target.value });
     }
+  };
+
+  const handleDelete = (provider: Provider) => {
+    setProviderToDelete(provider);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (providerToDelete) {
+      setProviders((prev) => prev.filter((p) => p.id !== providerToDelete.id));
+      setIsDeleteDialogOpen(false);
+      setProviderToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setProviderToDelete(null);
   };
 
   const filtered = providers.filter((p) =>
@@ -97,16 +104,10 @@ export default function ServiceProviders() {
               <td>{p.service}</td>
               <td>{p.email}</td>
               <td className={styles.actionButtons}>
-                <button
-                  onClick={() => handleEdit(p)}
-                  className={styles.editBtn}
-                >
+                <button onClick={() => handleEdit(p)} className={styles.editBtn}>
                   <Pencil className={styles.icon} />
                 </button>
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  className={styles.deleteBtn}
-                >
+                <button onClick={() => handleDelete(p)} className={styles.deleteBtn}>
                   <Trash2 className={styles.icon} />
                 </button>
               </td>
@@ -115,11 +116,9 @@ export default function ServiceProviders() {
         </tbody>
       </table>
 
+      {/* Dialog تعديل */}
       {selectedProvider && isDialogOpen && (
-        <div
-          className={styles.dialogOverlay}
-          onClick={() => setIsDialogOpen(false)}
-        >
+        <div className={styles.dialogOverlay} onClick={() => setIsDialogOpen(false)}>
           <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
             <h3>تعديل المزود رقم {selectedProvider.id}</h3>
             <input
@@ -143,6 +142,23 @@ export default function ServiceProviders() {
             <button onClick={handleUpdate} className={styles.updateButton}>
               تحديث
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Dialog حذف */}
+      {providerToDelete && isDeleteDialogOpen && (
+        <div className={styles.dialogOverlay} onClick={cancelDelete}>
+          <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
+            <h3>هل أنت متأكد أنك تريد حذف مزود الخدمة؟</h3>
+            <div className={styles.confirmButtons}>
+              <button className={`${styles.confirmBtn} ${styles.yes}`} onClick={confirmDelete}>
+                نعم
+              </button>
+              <button className={`${styles.confirmBtn} ${styles.no}`} onClick={cancelDelete}>
+                لا
+              </button>
+            </div>
           </div>
         </div>
       )}

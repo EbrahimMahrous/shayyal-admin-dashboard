@@ -21,7 +21,7 @@ const UserMap: React.FC<UserMapProps> = ({ data, title }) => {
   const mapRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
-    const width = 1000;
+    const width = 850;
     const height = 600;
     const svg = d3.select(mapRef.current);
     svg.selectAll("*").remove();

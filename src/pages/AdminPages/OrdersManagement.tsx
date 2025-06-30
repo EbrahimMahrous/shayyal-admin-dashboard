@@ -1,6 +1,5 @@
 // ** Style
 import styles from "../../styles/Pages/Admin/OrdersManagement.module.css";
-// ** Assets
 // ** Hooks
 import { useState, useEffect, type ChangeEvent } from "react";
 // ** Icons
@@ -18,18 +17,27 @@ export default function OrdersManagement() {
   const [search, setSearch] = useState<string>("");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [orderToDelete, setOrderToDelete] = useState<number | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     setOrders([
-      { id: 1, customer: "علي", status: "قيد المعالجة", total: 250 },
+      { id: 1, customer: "علي", status: "قيد التنفيذ", total: 250 },
       { id: 2, customer: "سارة", status: "مكتمل", total: 600 },
       { id: 3, customer: "عمر", status: "ملغي", total: 150 },
     ]);
   }, []);
 
-  const handleDelete = (id: number) => {
-    if (confirm("هل أنت متأكد أنك تريد حذف هذا الطلب؟")) {
-      setOrders(orders.filter((order) => order.id !== id));
+  const handleDeleteClick = (id: number) => {
+    setOrderToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (orderToDelete !== null) {
+      setOrders(orders.filter((order) => order.id !== orderToDelete));
+      setIsDeleteModalOpen(false);
+      setOrderToDelete(null);
     }
   };
 
@@ -88,7 +96,7 @@ export default function OrdersManagement() {
             <th>العميل</th>
             <th>الحالة</th>
             <th>الإجمالي (ر.س)</th>
-            <th className={styles.actions}></th>
+            <th className={styles.actions}>الاجراءات</th>
           </tr>
         </thead>
         <tbody>
@@ -106,7 +114,7 @@ export default function OrdersManagement() {
                   <Pencil className={styles.icon} />
                 </button>
                 <button
-                  onClick={() => handleDelete(order.id)}
+                  onClick={() => handleDeleteClick(order.id)}
                   className={styles.deleteBtn}
                 >
                   <Trash2 className={styles.icon} />
@@ -147,6 +155,34 @@ export default function OrdersManagement() {
             <button onClick={handleUpdate} className={styles.updateButton}>
               تحديث
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div
+          className={styles.dialogOverlay}
+          onClick={() => setIsDeleteModalOpen(false)}
+        >
+          <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginBottom: "1rem" }}>
+              هل أنت متأكد أنك تريد حذف هذا الطلب؟
+            </h3>
+            <div className={styles.confirmButtons}>
+              <button
+                onClick={confirmDelete}
+                className={`${styles.confirmBtn} ${styles.yes}`}
+              >
+                نعم
+              </button>
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className={`${styles.confirmBtn} ${styles.no}`}
+              >
+                لا
+              </button>
+            </div>
           </div>
         </div>
       )}

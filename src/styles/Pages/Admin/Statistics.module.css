@@ -113,7 +113,7 @@ option:hover {
   padding: 1rem;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
-  width: 450px;
+  width: 360px;
   text-align: center;
 }
 .tables_container {
