@@ -6,22 +6,41 @@ import statistics from "../assets/Pages/pie-chart.png";
 import manageOrder from "../assets/Pages/manage-order.png";
 import servicesProvider from "../assets/Pages/service-providor.png";
 import backHome from "../assets/Pages/back.png";
-import logo from "../assets/Pages/shayyalLogo.png";
+// import logo from "../assets/Pages/shayyalLogo.png";
+import profile from "../assets/Pages/profile.jpg";
 // ** Hooks
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
+// ** Auth
+import { useAuth } from "../context/AuthContext";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
+  const { logout } = useAuth();
 
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem("token");
+    navigate("/");
+  };
   return (
     <div className={style.adminLayout}>
       <div className={style.adminLayout_container}>
-        <div className= {style.logo_shayyall_container}>
+        {/* <div className={style.logo_shayyall_container}>
           <img className={style.logo_shayyall} src={logo} alt="logo" />
+        </div> */}
+        <div
+          className={style.adminInfo}
+          onClick={() => navigate("/admin/profile")}
+        >
+          <img src={profile} alt="" />
+          <h2>
+            مرحبًا <br />
+            {localStorage.getItem("admin_name")}
+          </h2>
+          {/* <p>{localStorage.getItem("admin_email")}</p> */}
         </div>
-
         <div className={style.adminLayout_content}>
           <div
             onClick={() => navigate("/admin")}
@@ -55,9 +74,9 @@ export default function AdminLayout() {
             <p>مزودي الخدمة</p>
           </div>
 
-          <div onClick={() => navigate("/")}>
+          <div onClick={handleLogout}>
             <img src={backHome} alt="back-home" />
-            <p>رجوع</p>
+            <p>تسجيل خروج</p>
           </div>
         </div>
       </div>

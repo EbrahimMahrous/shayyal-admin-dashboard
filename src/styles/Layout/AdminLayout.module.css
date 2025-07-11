@@ -32,12 +32,23 @@
   overflow-y: auto;
   z-index: 1000;
 }
-
-.logo_shayyall_container {
+.adminInfo {
+  text-align: center;
+  color: var(--main-color-dark);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.adminInfo img {
+  width: 40px;
+  height: 40px;
+}
+/* .logo_shayyall_container {
   display: flex;
   align-items: center;
   justify-content: center;
-}
+} */
 
 .adminLayout_container > img {
   margin: 16px 0;

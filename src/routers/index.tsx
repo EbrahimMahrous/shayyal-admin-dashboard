@@ -9,11 +9,14 @@ import FuturePlans from "../pages/LandingPages/FuturePlans";
 import IsAdmin from "../pages/IsAdmin";
 // ** AdminPages Components
 import AdminLayout from "../Layout/AdminLayout";
+import Profile from "../pages/AdminPages/Profile";
 import HomeAdmin from "../pages/AdminPages/HomeAdmin";
 import Statistics from "../pages/AdminPages/Statistics";
 import OrdersManagement from "../pages/AdminPages/OrdersManagement";
 import ServiceProviders from "../pages/AdminPages/ServiceProviders";
-
+// ** ProtectedRoute
+import ProtectedRoute from "../components/ProtectedRoute";
+import LogIn from "../pages/Auth/Login";
 
 export default function Routers() {
   return (
@@ -28,12 +31,22 @@ export default function Routers() {
           <Route path="future-plans" element={<FuturePlans />} />
           <Route path="is-admin" element={<IsAdmin />} />
         </Route>
+        {/* Login */}
+        <Route path="/login" element={<LogIn />} />
         {/* AdminLayout */}
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<HomeAdmin />} />
+          <Route
+            index
+            element={
+              <ProtectedRoute>
+                <HomeAdmin />
+              </ProtectedRoute>
+            }
+          />
           <Route path="statistics" element={<Statistics />} />
           <Route path="orders-management" element={<OrdersManagement />} />
           <Route path="service-providers" element={<ServiceProviders />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
     </>
