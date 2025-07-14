@@ -17,6 +17,7 @@ import ServiceProviders from "../pages/AdminPages/ServiceProviders";
 // ** ProtectedRoute
 import ProtectedRoute from "../components/ProtectedRoute";
 import LogIn from "../pages/Auth/Login";
+import Roles from "../pages/AdminPages/Roles";
 
 export default function Routers() {
   return (
@@ -46,6 +47,7 @@ export default function Routers() {
           <Route path="statistics" element={<Statistics />} />
           <Route path="orders-management" element={<OrdersManagement />} />
           <Route path="service-providers" element={<ServiceProviders />} />
+          <Route path="roles" element={<Roles />} />
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>

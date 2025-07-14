@@ -1,0 +1,281 @@
+/* Start Variables */
+:root {
+  /* Primary Brand Colors */
+  --main-color: #dc747d;
+  --main-color-light: #fbeaec;
+  --main-color-dark: #b85a62;
+
+  /* Secondary / Neutral Colors */
+  --secondary-color: #f0f0f0;
+  --text-color: #333;
+  --text-light: #666;
+  --bg-color: #ffffff;
+  --bg-alt-color: #f9f9f9;
+
+  /* Shadow & Border */
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --border-radius: 10px;
+}
+/* End Variables */
+
+.rolesContainer {
+  width: 100%;
+  padding: 2rem;
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  font-size: 1.8rem;
+  color: var(--main-color-dark);
+}
+
+.addButton {
+  background-color: var(--main-color);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.addButton:hover {
+  background-color: var(--main-color-dark);
+}
+
+/* Table Styles */
+.rolesTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
+.rolesTable th,
+.rolesTable td {
+  padding: 0.9rem;
+  border: 1px solid #eee;
+  text-align: center;
+}
+
+.rolesTable th {
+  background-color: var(--main-color-light);
+  color: var(--main-color-dark);
+}
+
+.rolesTable td button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin: 0 0.3rem;
+  color: var(--main-color-dark);
+  transition: color 0.2s ease;
+}
+
+.rolesTable td button:hover {
+  color: var(--main-color);
+}
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Box */
+.modal {
+  background-color: var(--bg-color);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  direction: rtl;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Modal Header */
+.modal h3 {
+  margin-bottom: 1rem;
+  color: var(--main-color-dark);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+/* Modal Content */
+.modal p {
+  margin: 0.5rem 0;
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.modal strong {
+  color: var(--main-color);
+}
+
+/* Modal Buttons */
+.modalActions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.modalButton {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Confirm Button */
+.confirmButton {
+  background-color: #dc3545;
+  color: white;
+}
+
+.confirmButton:hover {
+  background-color: #c82333;
+}
+
+/* Cancel Button */
+.cancelButton {
+  background-color: #ccc;
+  color: black;
+}
+
+.cancelButton:hover {
+  background-color: #999;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Content Wrapper */
+.modalContent {
+  background-color: var(--bg-color);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Header*/
+.modalContent h3 {
+  font-size: 1.6rem;
+  color: var(--main-color-dark);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* P*/
+.modalContent p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.modalContent strong {
+  color: var(--main-color);
+}
+
+/* Close Button*/
+.modalContent button {
+  margin-top: 0.2rem;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #ccc;
+  color: #000;
+  transition: background-color 0.2s ease;
+}
+
+.modalContent button:hover {
+  background-color: #999;
+}
+
+/* Form inside modal [Edit - Add] */
+.modalContent form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modalContent form input,
+.modalContent form textarea {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  background-color: var(--bg-alt-color);
+}
+
+.modalContent form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.modalContent form button[type="submit"] {
+  background-color: var(--main-color);
+  color: white;
+  font-size: 1rem;
+  padding: 0.7rem;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modalContent form button[type="submit"]:hover {
+  background-color: var(--main-color-dark);
+}
+
+.modalContent form button[type="button"] {
+  background-color: #ccc;
+  color: black;
+  padding: 0.6rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modalContent form button[type="button"]:hover {
+  background-color: #999;
+}

@@ -33,12 +33,14 @@
   z-index: 1000;
 }
 .adminInfo {
-  text-align: center;
+  text-align: right;
   color: var(--main-color-dark);
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 8px;
+
 }
 .adminInfo img {
   width: 40px;

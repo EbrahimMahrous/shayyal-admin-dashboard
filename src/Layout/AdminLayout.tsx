@@ -6,6 +6,7 @@ import statistics from "../assets/Pages/pie-chart.png";
 import manageOrder from "../assets/Pages/manage-order.png";
 import servicesProvider from "../assets/Pages/service-providor.png";
 import backHome from "../assets/Pages/back.png";
+import roles from "../assets/Pages/roles.svg";
 // import logo from "../assets/Pages/shayyalLogo.png";
 import profile from "../assets/Pages/profile.jpg";
 // ** Hooks
@@ -42,6 +43,7 @@ export default function AdminLayout() {
           {/* <p>{localStorage.getItem("admin_email")}</p> */}
         </div>
         <div className={style.adminLayout_content}>
+          
           <div
             onClick={() => navigate("/admin")}
             className={isActive("/admin") ? style.active : ""}
@@ -72,6 +74,14 @@ export default function AdminLayout() {
           >
             <img src={servicesProvider} alt="services-provider" />
             <p>مزودي الخدمة</p>
+          </div>
+
+          <div
+            onClick={() => navigate("/admin/roles")}
+            className={isActive("/admin/roles") ? style.active : ""}
+          >
+            <img src={roles} alt="roles-icon" />
+            <p>إدارة الأدوار</p>
           </div>
 
           <div onClick={handleLogout}>
