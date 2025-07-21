@@ -1,5 +1,5 @@
 // Roles.tsx
-import styles from "../../styles/Pages/Admin/Roles.module.css";
+import styles from "../../styles/Components/Modal.module.css";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 
@@ -100,13 +100,13 @@ export default function Roles() {
   };
 
   return (
-    <div className={styles.rolesContainer}>
+    <div className={styles.container}>
       <div className={styles.header}>
         <h2>إدارة الأدوار</h2>
         <button onClick={handleCreate} className={styles.addButton}>إضافة دور جديد</button>
       </div>
 
-      <table className={styles.rolesTable}>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th>#</th>

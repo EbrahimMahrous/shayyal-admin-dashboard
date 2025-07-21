@@ -6,7 +6,7 @@ import {
   FaToggleOn,
   FaToggleOff,
 } from "react-icons/fa";
-import styles from "../../styles/Pages/Admin/Admins.module.css";
+import styles from "../../styles/Components/Modal.module.css";
 
 type Admin = {
   id: number | string;
@@ -122,7 +122,7 @@ const Admins = () => {
   };
 
   return (
-    <div className={styles.adminsContainer}>
+    <div className={styles.container}>
       <div className={styles.header}>
         <h2>إدارة المشرفين</h2>
         <button className={styles.addButton} onClick={handleCreate}>
@@ -130,7 +130,7 @@ const Admins = () => {
         </button>
       </div>
 
-      <table className={styles.adminsTable}>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th>#</th>
@@ -173,10 +173,10 @@ const Admins = () => {
         </tbody>
       </table>
 
-      {/* Form Modal */}
+      {/* Add Modal */}
       {showFormModal && (
         <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
+          <div className={styles.modalContent}>
             <h3>{isEditing ? "تعديل مشرف" : "إضافة مشرف"}</h3>
             <form onSubmit={handleSubmit} className={styles.adminForm}>
               <input
@@ -210,10 +210,10 @@ const Admins = () => {
         </div>
       )}
 
-      {/* Details Modal */}
+      {/* Show Modal */}
       {showDetailsModal && selectedAdmin && (
         <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
+          <div className={styles.modalContent}>
             <h3>تفاصيل المشرف</h3>
             <p>
               <strong>الاسم:</strong> {selectedAdmin.name}
@@ -239,10 +239,10 @@ const Admins = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Modal */}
       {showDeleteModal && selectedAdmin && (
         <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
+          <div className={styles.modalContent}>
             <h3>هل أنت متأكد من حذف هذا المشرف؟</h3>
             <p>
               الاسم: <strong>{selectedAdmin.name}</strong>

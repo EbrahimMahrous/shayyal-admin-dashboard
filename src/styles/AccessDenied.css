@@ -4,7 +4,11 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  background: linear-gradient(
+    135deg,
+    var(--main-color),
+    var(--main-color-dark)
+  );
   color: #fff;
   text-align: center;
   animation: fadeIn 1s ease-in-out;

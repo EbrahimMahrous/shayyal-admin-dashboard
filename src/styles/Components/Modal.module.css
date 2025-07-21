@@ -1,4 +1,4 @@
-.rolesContainer {
+.container {
   width: 100%;
   padding: 2rem;
   background-color: var(--bg-color);
@@ -31,27 +31,42 @@
 .addButton:hover {
   background-color: var(--main-color-dark);
 }
+/* Inputs Styles */
+.searchInput {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--main-color-light);
+  font-size: 1rem;
+  width: 260px;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
 
-/* Table Styles */
-.rolesTable {
+.searchInput:focus {
+  outline: none;
+  border-color: var(--main-color);
+  box-shadow: 0 0 5px var(--main-color-light);
+}
+/* table Styles */
+.table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 2rem;
 }
 
-.rolesTable th,
-.rolesTable td {
+.table th,
+.table td {
   padding: 0.9rem;
   border: 1px solid #eee;
   text-align: center;
 }
 
-.rolesTable th {
+.table th {
   background-color: var(--main-color-light);
   color: var(--main-color-dark);
 }
 
-.rolesTable td button {
+.table td button {
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -61,9 +76,32 @@
   transition: color 0.2s ease;
 }
 
-.rolesTable td button:hover {
+.table td button:hover {
   color: var(--main-color);
 }
+/* Pagination */
+.pagination {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid var(--main-color-light);
+  background: #fff;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.pagination .activePage {
+  background: var(--main-color);
+  color: white;
+  font-weight: bold;
+  border-color: var(--main-color);
+}
+
 /* Modal Overlay */
 .modalOverlay {
   position: fixed;
@@ -79,7 +117,7 @@
 }
 
 /* Modal Box */
-.modal {
+.modalContent {
   background-color: var(--bg-color);
   padding: 2rem;
   border-radius: var(--border-radius);
@@ -181,7 +219,6 @@
   text-align: center;
 }
 
-/* P*/
 .modalContent p {
   margin: 0.5rem 0;
   font-size: 1rem;
@@ -194,14 +231,14 @@
 
 /* Close Button*/
 .modalContent button {
-  margin-top: 0.2rem;
+  margin: 0.2rem;
   padding: 0.6rem 1.2rem;
   border: none;
   border-radius: var(--border-radius);
   font-size: 1rem;
   cursor: pointer;
-  background-color: #ccc;
-  color: #000;
+  background-color: var(--main-color);
+  color: #fff;
   transition: background-color 0.2s ease;
 }
 
@@ -222,14 +259,19 @@
   font-size: 1rem;
   border: 1px solid #ddd;
   border-radius: var(--border-radius);
-  background-color: var(--bg-alt-color);
+  /* background-color: var(--bg-alt-color); */
 }
 
 .modalContent form textarea {
   min-height: 100px;
   resize: vertical;
 }
-
+.modalContent form input:focus,
+.modalContent form textarea:focus {
+  outline: none;
+  border-color: var(--main-color);
+  box-shadow: 0 0 5px var(--main-color-light);
+}
 .modalContent form button[type="submit"] {
   background-color: var(--main-color);
   color: white;

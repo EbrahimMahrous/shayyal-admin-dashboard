@@ -16,7 +16,6 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
     try {
       const response = await fetch(
         "https://otmove.online/api/v1/dashboard/login",
@@ -28,9 +27,7 @@ export default function Login() {
           body: JSON.stringify({ email, password }),
         }
       );
-
       const data = await response.json();
-
       if (response.ok && data.success) {
         const token = data.token;
         const { name, email } = data.admin;
@@ -49,6 +46,8 @@ export default function Login() {
     }
   };
 
+
+  
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>تسجيل الدخول</h2>
