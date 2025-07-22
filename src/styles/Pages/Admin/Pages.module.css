@@ -1,0 +1,83 @@
+.container {
+  width: 100%;
+  padding: 2rem;
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--main-color-dark);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.textareaGroup {
+  margin-bottom: 1.5rem;
+}
+.textareaGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+.textareaGroup textarea {
+  width: 97%;
+  min-height: 150px;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  background-color: var(--bg-alt-color);
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+.textareaGroup textarea:focus {
+  border-color: var(--main-color);
+  outline: none;
+}
+.button {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--main-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+.tab {
+  padding: 10px 20px;
+  background-color: var(--main-color-light);
+  color: var(--main-color-dark);
+  border: 1px solid var(--main-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.tab:hover {
+  background-color: var(--main-color);
+  color: #fff;
+}
+.activeTab {
+  background-color: var(--main-color);
+  color: white;
+}
+.button:hover {
+  background-color: var(--main-color-dark);
+}
+.message {
+  margin-top: 15px;
+  text-align: center;
+  color: green;
+  font-weight: bold;
+}

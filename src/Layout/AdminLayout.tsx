@@ -1,13 +1,13 @@
 // ** Styles
 import style from "../styles/Layout/AdminLayout.module.css";
 // ** Assets
-import profile from "../assets/Pages/user.png";
 import mainIcon from "../assets/Pages/home.svg";
-import statistics from "../assets/Pages/stats.svg";
 import roles from "../assets/Pages/roles.svg";
-import backHome from "../assets/Pages/logout.svg";
+import logOut from "../assets/Pages/logout.svg";
 import manageAdmins from "../assets/Pages/management-admins.svg";
-// import logo from "../assets/Pages/shayyalLogo.png";
+import payment from "../assets/Pages/payment.svg";
+import settings from "../assets/Pages/settings.svg";
+import pages from "../assets/Pages/pages.svg";
 // ** Hooks
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 // ** Auth
@@ -25,34 +25,22 @@ export default function AdminLayout() {
   return (
     <div className={style.adminLayout}>
       <div className={style.adminLayout_container}>
-        {/* <div className={style.logo_shayyall_container}>
-          <img className={style.logo_shayyall} src={logo} alt="logo" />
-        </div> */}
         <div
           className={style.adminInfo}
           onClick={() => navigate("/admin/profile")}
         >
-          <img src={profile} alt="" />
           <h2>
-            كيفك <br />
+            اهلا بيك <br />
             {localStorage.getItem("admin_name")}
           </h2>
-          {/* <p>{localStorage.getItem("admin_email")}</p> */}
         </div>
         <div className={style.adminLayout_content}>
           <div
             onClick={() => navigate("/admin")}
             className={isActive("/admin") ? style.active : ""}
           >
-            <img src={mainIcon} alt="main-icon" />
+            <img src={mainIcon} alt="home-icon" />
             <p>الرئيسية</p>
-          </div>
-          <div
-            onClick={() => navigate("/admin/statistics")}
-            className={isActive("/admin/statistics") ? style.active : ""}
-          >
-            <img src={statistics} alt="statistics-icon" />
-            <p>إحصائيات</p>
           </div>
           <div
             onClick={() => navigate("/admin/roles")}
@@ -68,8 +56,31 @@ export default function AdminLayout() {
             <img src={manageAdmins} alt="manageAdmins-icon" />
             <p>إدارة المشرفين</p>
           </div>
+
+          <div
+            onClick={() => navigate("/admin/payment")}
+            className={isActive("/admin/payment") ? style.active : ""}
+          >
+            <img src={payment} alt="payment-icon" />
+            <p>المدفوعات</p>
+          </div>
+
+          <div
+            onClick={() => navigate("/admin/pages")}
+            className={isActive("/admin/pages") ? style.active : ""}
+          >
+            <img src={pages} alt="pages-icon" />
+            <p>اداره الصفحات</p>
+          </div>
+          <div
+            onClick={() => navigate("/admin/settings")}
+            className={isActive("/admin/settings") ? style.active : ""}
+          >
+            <img src={settings} alt="settings-icon" />
+            <p>الاعدادات</p>
+          </div>
           <div onClick={handleLogout}>
-            <img src={backHome} alt="back-home" />
+            <img src={logOut} alt="logout-home" />
             <p>تسجيل خروج</p>
           </div>
         </div>

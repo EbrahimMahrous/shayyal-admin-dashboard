@@ -1,0 +1,55 @@
+.container {
+  width: 100%;
+  padding: 2rem;
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: var(--main-color-dark);
+  text-align: center;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+.inputGroup label {
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+.inputGroup input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+}
+.button {
+  margin-top: 30px;
+  padding: 12px 20px;
+  background: var(--main-color);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  transition: 0.3s;
+}
+.button:hover {
+  background: var(--main-color-dark);
+}
+.message {
+  margin-top: 15px;
+  text-align: center;
+  color: green;
+  font-weight: bold;
+}

@@ -11,7 +11,7 @@ import IsAdmin from "../pages/IsAdmin";
 import AdminLayout from "../Layout/AdminLayout";
 import Profile from "../pages/AdminPages/Profile";
 import HomeAdmin from "../pages/AdminPages/HomeAdmin";
-import Statistics from "../pages/AdminPages/Statistics";
+// import Statistics from "../pages/AdminPages/Statistics";
 // ** ProtectedRoute
 import ProtectedRoute from "../components/ProtectedRoute";
 import LogIn from "../pages/Auth/Login";
@@ -22,6 +22,9 @@ import Customers from "../pages/HomeAdmin/Customers";
 import Drivers from "../pages/HomeAdmin/Drivers";
 import Orders from "../pages/HomeAdmin/Orders";
 import Items from "../pages/HomeAdmin/Items";
+import Payments from "../pages/AdminPages/Payments";
+import Settings from "../pages/AdminPages/Settings";
+import Pages from "../pages/AdminPages/Pages";
 
 export default function Routers() {
   return (
@@ -48,9 +51,12 @@ export default function Routers() {
               </ProtectedRoute>
             }
           />
-          <Route path="statistics" element={<Statistics />} />
+          {/* <Route path="statistics" element={<Statistics />} /> */}
           <Route path="roles" element={<Roles />} />
           <Route path="admins" element={<Admins />} />
+          <Route path="payment" element={<Payments />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="pages" element={<Pages />} />
           <Route path="profile" element={<Profile />} />
           {/* Home Admin */}
           <Route path="customers" element={<Customers />} />
