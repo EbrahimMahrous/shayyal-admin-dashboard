@@ -1,4 +1,4 @@
-// Roles.tsx
+
 import styles from "../../styles/Components/Modal.module.css";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
@@ -14,11 +14,17 @@ interface Role {
 export default function Roles() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-  const [formData, setFormData] = useState({ name: "", display_name: "", description: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    display_name: "",
+    description: "",
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const token = localStorage.getItem("admin_token");
 
   const fetchRoles = async () => {
@@ -29,12 +35,17 @@ export default function Roles() {
     if (data.success) setRoles(data.roles.data);
   };
 
-  useEffect(() => { fetchRoles(); }, []);
+  useEffect(() => {
+    fetchRoles();
+  }, []);
 
   const handleShow = async (id: number) => {
-    const res = await fetch(`https://otmove.online/api/v1/dashboard/roles/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetch(
+      `https://otmove.online/api/v1/dashboard/roles/${id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     const data = await res.json();
     if (data.success) {
       setSelectedRole(data.role);
@@ -49,13 +60,24 @@ export default function Roles() {
 
   const confirmDelete = async () => {
     if (!selectedRole) return;
-    const res = await fetch(`https://otmove.online/api/v1/dashboard/roles/${selectedRole.id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    if (data.success) {
-      fetchRoles();
+    try {
+      const res = await fetch(
+        `https://otmove.online/api/v1/dashboard/roles/${selectedRole.id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        fetchRoles();
+        setMessage("تم الحذف بنجاح");
+      } else {
+        setError("فشل في الحذف، حاول لاحقاً");
+      }
+    } catch (err) {
+      setError("حدث خطأ في الاتصال بالخادم");
+    } finally {
       setShowDeleteModal(false);
     }
   };
@@ -84,18 +106,26 @@ export default function Roles() {
       : "https://otmove.online/api/v1/dashboard/roles";
     const method = isEditing ? "PUT" : "POST";
 
-    const res = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(formData),
-    });
-    const data = await res.json();
-    if (data.success) {
-      fetchRoles();
-      setShowFormModal(false);
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setMessage(isEditing ? "تم التحديث بنجاح" : "تم الإضافة بنجاح");
+        fetchRoles();
+        setShowFormModal(false);
+      } else {
+        setError("فشل في الحفظ، تحقق من البيانات");
+      }
+    } catch (err) {
+      setError("خطأ في الاتصال بالخادم");
     }
   };
 
@@ -103,7 +133,9 @@ export default function Roles() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>إدارة الأدوار</h2>
-        <button onClick={handleCreate} className={styles.addButton}>إضافة دور جديد</button>
+        <button onClick={handleCreate} className={styles.addButton}>
+          إضافة دور جديد
+        </button>
       </div>
 
       <table className={styles.table}>
@@ -124,14 +156,23 @@ export default function Roles() {
               <td>{role.description || "-"}</td>
               <td>{new Date(role.created_at).toLocaleDateString()}</td>
               <td>
-                <button onClick={() => handleShow(role.id)}><FaEye /></button>
-                <button onClick={() => handleEdit(role)}><FaEdit /></button>
-                <button onClick={() => handleDelete(role)}><FaTrash /></button>
+                <button onClick={() => handleShow(role.id)}>
+                  <FaEye />
+                </button>
+                <button onClick={() => handleEdit(role)}>
+                  <FaEdit />
+                </button>
+                <button onClick={() => handleDelete(role)}>
+                  <FaTrash />
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {message && <div className={styles.successMessage}>{message}</div>}
+      {error && <div className={styles.errorMessage}>{error}</div>}
 
       {showFormModal && (
         <div className={styles.modalOverlay}>
@@ -142,22 +183,30 @@ export default function Roles() {
                 type="text"
                 placeholder="الاسم"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 required
               />
               <input
                 type="text"
                 placeholder="الاسم المعروض"
                 value={formData.display_name}
-                onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, display_name: e.target.value })
+                }
               />
               <textarea
                 placeholder="الوصف"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
               ></textarea>
               <button type="submit">{isEditing ? "تحديث" : "إنشاء"}</button>
-              <button type="button" onClick={() => setShowFormModal(false)}>إلغاء</button>
+              <button type="button" onClick={() => setShowFormModal(false)}>
+                إلغاء
+              </button>
             </form>
           </div>
         </div>
@@ -167,8 +216,13 @@ export default function Roles() {
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <h3>تفاصيل الدور</h3>
-            <p><strong>الاسم:</strong> {selectedRole.display_name || selectedRole.name}</p>
-            <p><strong>الوصف:</strong> {selectedRole.description || "-"}</p>
+            <p>
+              <strong>الاسم:</strong>{" "}
+              {selectedRole.display_name || selectedRole.name}
+            </p>
+            <p>
+              <strong>الوصف:</strong> {selectedRole.description || "-"}
+            </p>
             <button onClick={() => setShowDetailsModal(false)}>إغلاق</button>
           </div>
         </div>
@@ -178,9 +232,14 @@ export default function Roles() {
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <h3>هل أنت متأكد من حذف الدور؟</h3>
-            <p>اسم الدور: <strong>{selectedRole.display_name || selectedRole.name}</strong></p>
+            <p>
+              اسم الدور:{" "}
+              <strong>{selectedRole.display_name || selectedRole.name}</strong>
+            </p>
             <div className={styles.modalActions}>
-              <button onClick={confirmDelete} className={styles.deleteButton}>حذف</button>
+              <button onClick={confirmDelete} className={styles.deleteButton}>
+                حذف
+              </button>
               <button onClick={() => setShowDeleteModal(false)}>إلغاء</button>
             </div>
           </div>
