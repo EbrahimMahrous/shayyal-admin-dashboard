@@ -46,8 +46,6 @@ export default function Login() {
     }
   };
 
-
-  
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>تسجيل الدخول</h2>

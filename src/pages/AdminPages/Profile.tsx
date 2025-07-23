@@ -11,7 +11,9 @@ export default function Profile() {
   // const [employee, setEmployee] = useState<Employee | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -49,6 +51,10 @@ export default function Profile() {
   };
 
   const handlePasswordUpdate = async () => {
+    if (newPassword !== confirmPassword) {
+      return setMessage("❌ تأكيد كلمة المرور غير متطابق");
+    }
+
     try {
       const res = await fetch(
         "https://otmove.online/api/v1/dashboard/edit_password",
@@ -58,18 +64,26 @@ export default function Profile() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.admin_token}`,
           },
-          body: JSON.stringify({ password }),
+          body: JSON.stringify({
+            old_password: oldPassword,
+            password: newPassword,
+            password_confirmation: confirmPassword,
+          }),
         }
       );
 
       const data = await res.json();
       if (data.success) {
         setMessage("✅ تم تحديث كلمة المرور بنجاح");
-        setPassword("");
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        setMessage("❌ حدث خطأ أثناء تحديث كلمة المرور");
       }
     } catch (err) {
       console.error(err);
-      setMessage("حدث خطأ أثناء تحديث كلمة المرور");
+      setMessage("❌ حدث خطأ أثناء تحديث كلمة المرور");
     }
   };
 
@@ -98,9 +112,21 @@ export default function Profile() {
         <h3>تغيير كلمة المرور</h3>
         <input
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={oldPassword}
+          onChange={(e) => setOldPassword(e.target.value)}
+          placeholder="كلمة المرور الحالية"
+        />
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
           placeholder="كلمة المرور الجديدة"
+        />
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="تأكيد كلمة المرور الجديدة"
         />
         <button onClick={handlePasswordUpdate}>تحديث كلمة المرور</button>
       </div>
