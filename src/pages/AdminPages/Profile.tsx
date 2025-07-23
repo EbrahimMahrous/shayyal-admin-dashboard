@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import styles from "../../styles/Pages/Admin/Profile.module.css";
 
-type Employee = {
-  id: number;
-  name: string;
-  email: string;
-};
+// type Employee = {
+//   id: number;
+//   name: string;
+//   email: string;
+// };
 
 export default function Profile() {
-  const [employee, setEmployee] = useState<Employee | null>(null);
+  // const [employee, setEmployee] = useState<Employee | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +17,7 @@ export default function Profile() {
   useEffect(() => {
     const storedName = localStorage.getItem("admin_name") || "";
     const storedEmail = localStorage.getItem("admin_email") || "";
-    setEmployee({ id: 4, name: storedName, email: storedEmail });
+    // setEmployee({ id: 4, name: storedName, email: storedEmail });
     setName(storedName);
     setEmail(storedEmail);
   }, []);

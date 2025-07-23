@@ -1,11 +1,16 @@
 // ** Styles
 import styles from "../../styles/Pages/Admin/HomeAdmin.module.css";
+
 // ** React & Chart.js
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Chart from "chart.js/auto";
+
 // ** react-countUp
 import CountUp from "react-countup";
 import { useNavigate } from "react-router-dom";
+
+// ** Utils
+import { debounce } from "lodash";
 
 interface OrdersPerMonth {
   date: string;
@@ -38,21 +43,6 @@ let orderStatusPieInstance: Chart | null = null;
 
 export default function HomeAdmin() {
   const navigate = useNavigate();
-  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(true);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [fromDate, setFromDate] = useState<string>("");
-  const [toDate, setToDate] = useState<string>("");
-  const [selectedCustomer, setSelectedCustomer] = useState<string>("");
-  const [selectedProvider, setSelectedProvider] = useState<string>("");
-
-  const handleUpdateClick = async () => {
-    setIsUpdating(true);
-    await fetchStats();
-    setTimeout(() => {
-      setIsUpdating(false);
-    }, 1000);
-  };
-
   const [stats, setStats] = useState<DashboardStats>({
     users: 0,
     orders: 0,
@@ -63,19 +53,28 @@ export default function HomeAdmin() {
     orderStatus: [],
   });
 
+  const [loading, setLoading] = useState(true);
+  const [maintenanceMode, setMaintenanceMode] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [selectedProvider, setSelectedProvider] = useState("");
+
+  const token = localStorage.getItem("admin_token");
+
+  const headers = useMemo(() => ({
+    Authorization: `Bearer ${token}`,
+    Accept: "application/json",
+  }), [token]);
+
   const toggleMaintenance = () => {
     setMaintenanceMode((prev) => !prev);
   };
 
   const fetchStats = async () => {
-    const token = localStorage.getItem("admin_token");
     if (!token) return;
     try {
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      };
-
       const query = new URLSearchParams();
       if (fromDate) query.append("from", fromDate);
       if (toDate) query.append("to", toDate);
@@ -86,9 +85,7 @@ export default function HomeAdmin() {
       const [usersRes, providersRes, ordersRes, itemsRes] = await Promise.all([
         fetch("https://otmove.online/api/v1/dashboard/customers", { headers }),
         fetch("https://otmove.online/api/v1/dashboard/drivers", { headers }),
-        fetch(`https://otmove.online/api/v1/dashboard/orders?${queryString}`, {
-          headers,
-        }),
+        fetch(`https://otmove.online/api/v1/dashboard/orders?${queryString}`, { headers }),
         fetch("https://otmove.online/api/v1/dashboard/items", { headers }),
       ]);
 
@@ -97,24 +94,21 @@ export default function HomeAdmin() {
       const ordersData = await ordersRes.json();
       const itemsData = await itemsRes.json();
 
-      const statusCounts: { [key: string]: number } = {};
       const ordersList = ordersData.orders?.data || [];
-      ordersList.forEach((order: any) => {
-        const status = order.status;
-        if (status) {
-          statusCounts[status] = (statusCounts[status] || 0) + 1;
-        }
-      });
-
-      const formattedOrderStatus: OrderStatus[] = Object.entries(
-        statusCounts
-      ).map(([label, value]) => ({ label, value }));
-
+      const statusCounts: { [key: string]: number } = {};
       const groupedOrders: { [date: string]: number } = {};
+
       ordersList.forEach((order: any) => {
         const date = new Date(order.created_at).toISOString().split("T")[0];
+        const status = order.status;
         groupedOrders[date] = (groupedOrders[date] || 0) + 1;
+        if (status) statusCounts[status] = (statusCounts[status] || 0) + 1;
       });
+
+      const formattedOrderStatus: OrderStatus[] = Object.entries(statusCounts)
+        .map(([label, value]) => ({ label, value }))
+        .sort((a, b) => b.value - a.value);
+
       const ordersPerMonth = Object.entries(groupedOrders).map(
         ([date, count]) => ({ date, count })
       );
@@ -129,33 +123,42 @@ export default function HomeAdmin() {
         orderStatus: formattedOrderStatus,
       });
     } catch (error) {
-      console.error("حدث خطأ أثناء جلب البيانات:", error);
+      console.error("فشل في تحميل البيانات:", error);
     }
   };
 
+  const debouncedFetchStats = useMemo(() => debounce(fetchStats, 500), [fromDate, toDate, selectedCustomer, selectedProvider]);
+  
   useEffect(() => {
-    fetchStats();
+    fetchStats().then(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    debouncedFetchStats();
+    return () => debouncedFetchStats.cancel();
   }, [fromDate, toDate, selectedCustomer, selectedProvider]);
 
   useEffect(() => {
     if (!stats.ordersPerMonth.length) return;
 
-    const ctxBar = (
-      document.getElementById("ordersBarChart") as HTMLCanvasElement
-    )?.getContext("2d");
+    const ctxBar = (document.getElementById("ordersBarChart") as HTMLCanvasElement)?.getContext("2d");
+    const ctxLine = (document.getElementById("usersLineChart") as HTMLCanvasElement)?.getContext("2d");
+    const ctxPie = (document.getElementById("orderStatusPie") as HTMLCanvasElement)?.getContext("2d");
+
+    ordersBarChartInstance?.destroy();
+    usersLineChartInstance?.destroy();
+    orderStatusPieInstance?.destroy();
+
     if (ctxBar) {
-      if (ordersBarChartInstance) ordersBarChartInstance.destroy();
       ordersBarChartInstance = new Chart(ctxBar, {
         type: "bar",
         data: {
           labels: stats.ordersPerMonth.map((item) => item.date),
-          datasets: [
-            {
-              label: "الطلبات",
-              data: stats.ordersPerMonth.map((item) => item.count),
-              backgroundColor: "#b85a62",
-            },
-          ],
+          datasets: [{
+            label: "الطلبات",
+            data: stats.ordersPerMonth.map((item) => item.count),
+            backgroundColor: "#b85a62",
+          }],
         },
         options: {
           responsive: true,
@@ -167,164 +170,104 @@ export default function HomeAdmin() {
       });
     }
 
-    const ctxLine = (
-      document.getElementById("usersLineChart") as HTMLCanvasElement
-    )?.getContext("2d");
     if (ctxLine) {
-      if (usersLineChartInstance) usersLineChartInstance.destroy();
       usersLineChartInstance = new Chart(ctxLine, {
         type: "line",
         data: {
           labels: stats.ordersPerMonth.map((item) => item.date),
-          datasets: [
-            {
-              label: "الطلبات اليومية",
-              data: stats.ordersPerMonth.map((item) => item.count),
-              borderColor: "#b85a62",
-              tension: 0.4,
-            },
-          ],
+          datasets: [{
+            label: "الطلبات اليومية",
+            data: stats.ordersPerMonth.map((item) => item.count),
+            borderColor: "#b85a62",
+            tension: 0.4,
+          }],
         },
         options: { responsive: true, plugins: { legend: { display: false } } },
       });
     }
 
-    const ctxPie = (
-      document.getElementById("orderStatusPie") as HTMLCanvasElement
-    )?.getContext("2d");
     if (ctxPie) {
-      if (orderStatusPieInstance) orderStatusPieInstance.destroy();
       orderStatusPieInstance = new Chart(ctxPie, {
         type: "pie",
         data: {
           labels: stats.orderStatus.map((s) => s.label),
-          datasets: [
-            {
-              data: stats.orderStatus.map((s) => s.value),
-              backgroundColor: [
-                "#dc747d",
-                "#f0ad4e",
-                "#5cb85c",
-                "#5bc0de",
-                "#292b2c",
-              ],
-            },
-          ],
+          datasets: [{
+            data: stats.orderStatus.map((s) => s.value),
+            backgroundColor: ["#dc747d", "#f0ad4e", "#5cb85c", "#5bc0de", "#292b2c"],
+          }],
         },
         options: { responsive: true },
       });
     }
-
-    return () => {
-      ordersBarChartInstance?.destroy();
-      usersLineChartInstance?.destroy();
-      orderStatusPieInstance?.destroy();
-    };
   }, [stats]);
+
+  const handleUpdateClick = async () => {
+    setIsUpdating(true);
+    await fetchStats();
+    setTimeout(() => setIsUpdating(false), 1000);
+  };
 
   return (
     <div className={styles.container} dir="rtl">
       <h1 className={styles.heading}>نورتنا يا بطل! لوحة التحكم أحلى بيك</h1>
 
       <div className={styles.filters}>
-        <label>
-          من:
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-          />
-        </label>
-        <label>
-          إلى:
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-          />
-        </label>
-        <label>
-          العميل:
-          <input
-            type="text"
-            value={selectedCustomer}
-            onChange={(e) => setSelectedCustomer(e.target.value)}
-            placeholder="ID العميل"
-          />
-        </label>
-        <label>
-          مزود الخدمة:
-          <input
-            type="text"
-            value={selectedProvider}
-            onChange={(e) => setSelectedProvider(e.target.value)}
-            placeholder="ID المزود"
-          />
-        </label>
+        <label>من:<input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} /></label>
+        <label>إلى:<input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} /></label>
+        <label>العميل:<input type="text" value={selectedCustomer} onChange={(e) => setSelectedCustomer(e.target.value)} placeholder="ID العميل" /></label>
+        <label>مزود الخدمة:<input type="text" value={selectedProvider} onChange={(e) => setSelectedProvider(e.target.value)} placeholder="ID المزود" /></label>
       </div>
 
-      <div className={styles.statsGrid}>
-        <div
-          onClick={() => navigate("/admin/customers")}
-          className={styles.card}
-        >
-          <h2>عدد المستخدمين</h2>
-          <p>
-            <CountUp end={stats.users} duration={1.5} separator="," />
-          </p>
-        </div>
-        <div onClick={() => navigate("/admin/orders")} className={styles.card}>
-          <h2>عدد الطلبات</h2>
-          <p>
-            <CountUp end={stats.orders} duration={1.5} separator="," />
-          </p>
-        </div>
-        <div onClick={() => navigate("/admin/drivers")} className={styles.card}>
-          <h2>مقدمو الخدمة</h2>
-          <p>
-            <CountUp end={stats.providers} duration={1.5} separator="," />
-          </p>
-        </div>
-        <div onClick={() => navigate("/admin/items")} className={styles.card}>
-          <h2>عدد العناصر</h2>
-          <p>
-            <CountUp end={stats.items} duration={1.5} separator="," />
-          </p>
-        </div>
-      </div>
+      {loading ? (
+        <p>جاري تحميل البيانات...</p>
+      ) : (
+        <>
+          <div className={styles.statsGrid}>
+            <StatCard title="عدد المستخدمين" value={stats.users} onClick={() => navigate("/admin/customers")} />
+            <StatCard title="عدد الطلبات" value={stats.orders} onClick={() => navigate("/admin/orders")} />
+            <StatCard title="مقدمو الخدمة" value={stats.providers} onClick={() => navigate("/admin/drivers")} />
+            <StatCard title="عدد العناصر" value={stats.items} onClick={() => navigate("/admin/items")} />
+          </div>
 
-      <div className={styles.charts_container}>
-        <div className={styles.chart_card}>
-          <h3 className={styles.subheading}>الطلبات يوميًا</h3>
-          <canvas id="ordersBarChart" height="100"></canvas>
-        </div>
-        <div className={`${styles.chart_card} ${styles.pieChart}`}>
-          <h3 className={styles.subheading}>توزيع حالات الطلبات</h3>
-          <canvas id="orderStatusPie" height="100"></canvas>
-        </div>
-        <div className={styles.chart_card}>
-          <h3 className={styles.subheading}>الطلبات اليومية بالرسم الخطي</h3>
-          <canvas id="usersLineChart" height="100"></canvas>
-        </div>
-      </div>
+          <div className={styles.charts_container}>
+            <div className={styles.chart_card}>
+              <h3 className={styles.subheading}>الطلبات يوميًا</h3>
+              <canvas id="ordersBarChart" height="100"></canvas>
+            </div>
+            <div className={`${styles.chart_card} ${styles.pieChart}`}>
+              <h3 className={styles.subheading}>توزيع حالات الطلبات</h3>
+              <canvas id="orderStatusPie" height="100"></canvas>
+            </div>
+            <div className={styles.chart_card}>
+              <h3 className={styles.subheading}>الطلبات اليومية بالرسم الخطي</h3>
+              <canvas id="usersLineChart" height="100"></canvas>
+            </div>
+          </div>
 
-      <div className={styles.actionsSection}>
-        <h3 className={styles.subheading}>إجراءات سريعة</h3>
-        <div className={styles.actionsGrid}>
-          <button
-            className={`${styles.actionBtn} ${
-              maintenanceMode ? styles.maintenanceOn : styles.maintenanceOff
-            }`}
-            onClick={toggleMaintenance}
-          >
-            {maintenanceMode ? "إيقاف وضع الصيانة" : "تفعيل وضع الصيانة"}
-          </button>
+          <div className={styles.actionsSection}>
+            <h3 className={styles.subheading}>إجراءات سريعة</h3>
+            <div className={styles.actionsGrid}>
+              <button
+                className={`${styles.actionBtn} ${maintenanceMode ? styles.maintenanceOn : styles.maintenanceOff}`}
+                onClick={toggleMaintenance}
+              >
+                {maintenanceMode ? "إيقاف وضع الصيانة" : "تفعيل وضع الصيانة"}
+              </button>
 
-          <button className={styles.actionBtn} onClick={handleUpdateClick}>
-            {isUpdating ? " جاري تحديث البيانات..." : " تحديث البيانات"}
-          </button>
-        </div>
-      </div>
+              <button className={styles.actionBtn} onClick={handleUpdateClick}>
+                {isUpdating ? " جاري تحديث البيانات..." : "تحديث البيانات"}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
+
+const StatCard = ({ title, value, onClick }: { title: string; value: number; onClick: () => void }) => (
+  <div onClick={onClick} className={styles.card}>
+    <h2>{title}</h2>
+    <p><CountUp end={value} duration={1.5} separator="," /></p>
+  </div>
+);
