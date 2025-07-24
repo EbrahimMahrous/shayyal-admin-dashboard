@@ -1,102 +1,153 @@
 import { useEffect, useState } from "react";
-// ** Styles
 import styles from "../../styles/Components/Modal.module.css";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaEye } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-type Item = {
+// Types
+interface Item {
   id: number;
   name: string;
   created_at: string;
-};
+  updated_at?: string;
+}
 
 const Items = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [formData, setFormData] = useState({ name: "" });
-
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
   const token = localStorage.getItem("admin_token");
 
   const fetchItems = async () => {
-    const res = await fetch("https://otmove.online/api/v1/dashboard/items", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    if (data.success) setItems(data.items.data);
+    setLoading(true);
+    try {
+      const res = await fetch("https://otmove.online/api/v1/dashboard/items", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) setItems(data.items.data);
+    } catch (err) {
+      toast.error("فشل في تحميل العناصر");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchItemDetails = async (id: number) => {
+    try {
+      const res = await fetch(
+        `https://otmove.online/api/v1/dashboard/items/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        setSelectedItem(data.item);
+        setShowViewModal(true);
+      }
+    } catch (err) {
+      toast.error("فشل تحميل تفاصيل العنصر");
+    }
   };
 
   useEffect(() => {
     fetchItems();
   }, []);
 
-  const handleEdit = (item: Item) => {
-    setSelectedItem(item);
-    setFormData({ name: item.name });
-    setShowEditModal(true);
-  };
-
-  const handleDelete = (item: Item) => {
-    setSelectedItem(item);
-    setShowDeleteModal(true);
-  };
-
-  const handleCreate = () => {
-    setFormData({ name: "" });
-    setShowCreateModal(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!selectedItem) return;
-    await fetch(
-      `https://otmove.online/api/v1/dashboard/items/${selectedItem.id}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    setShowDeleteModal(false);
-    fetchItems();
-  };
-
-  const submitEdit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedItem) return;
-    await fetch(
-      `https://otmove.online/api/v1/dashboard/items/${selectedItem.id}`,
-      {
+    const url = isEditing
+      ? `https://otmove.online/api/v1/dashboard/items/${selectedItem?.id}`
+      : "https://otmove.online/api/v1/dashboard/items";
+
+    try {
+      const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success(isEditing ? "تم التعديل بنجاح" : "تمت الإضافة بنجاح");
+        fetchItems();
+        setShowForm(false);
+      } else {
+        toast.error("حدث خطأ أثناء الحفظ");
       }
-    );
-    setShowEditModal(false);
-    fetchItems();
+    } catch (err) {
+      toast.error("فشل الاتصال بالسيرفر");
+    }
   };
 
-  const submitCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await fetch("https://otmove.online/api/v1/dashboard/items", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+  const handleEdit = (item: Item) => {
+    setIsEditing(true);
+    setSelectedItem(item);
+    setFormData({ name: item.name });
+    setShowForm(true);
+  };
+
+  const handleCreate = () => {
+    setIsEditing(false);
+    setFormData({ name: "" });
+    setShowForm(true);
+  };
+
+  const handleDelete = (item: Item) => {
+    Swal.fire({
+      title: "هل أنت متأكد؟",
+      text: `سيتم حذف العنصر: ${item.name}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "نعم، احذف",
+      cancelButtonText: "إلغاء",
+      customClass: {
+        popup: styles.swal_popup,
+        title: styles.swal_title,
+        confirmButton: styles.swal_confirm_btn,
+        cancelButton: styles.swal_cancel_btn,
       },
-      body: JSON.stringify(formData),
+      background: "var(--bg-color)",
+      color: "var(--text-color)",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch(
+            `https://otmove.online/api/v1/dashboard/items/${item.id}`,
+            {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const data = await res.json();
+
+          if (data.success) {
+            toast.success("تم حذف العنصر");
+            fetchItems();
+          } else {
+            toast.error(data.message || "لا يمكن حذف هذا العنصر");
+          }
+        } catch (err) {
+          toast.error("فشل الحذف، تحقق من الاتصال");
+        }
+      }
     });
-    setShowCreateModal(false);
-    fetchItems();
   };
 
-  //  Filter + Pagination
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -109,55 +160,60 @@ const Items = () => {
 
   return (
     <div className={styles.container}>
+      <ToastContainer position="top-left" autoClose={3000} />
       <div className={styles.header}>
         <h2>إدارة العناصر</h2>
-        <button onClick={handleCreate} className={styles.addButton}>
+      </div>
+
+      <div className={styles.header}>
+        <input
+          type="text"
+          placeholder="بحث..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className={styles.searchInput}
+        />
+        <button className={styles.addButton} onClick={handleCreate}>
           <FaPlus /> إضافة عنصر
         </button>
       </div>
 
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="ابحث باسم العنصر..."
-        className={styles.searchInput}
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setCurrentPage(1);
-        }}
-      />
-
-      {/* Table */}
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>الاسم</th>
-            <th>تاريخ الإنشاء</th>
-            <th>إجراءات</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedItems.map((item, i) => (
-            <tr key={item.id}>
-              <td>{startIndex + i + 1}</td>
-              <td>{item.name}</td>
-              <td>{new Date(item.created_at).toLocaleDateString()}</td>
-              <td>
-                <button title="تعديل" onClick={() => handleEdit(item)}>
-                  <FaEdit />
-                </button>
-                <button title="حذف" onClick={() => handleDelete(item)}>
-                  <FaTrash />
-                </button>
-              </td>
+      {loading ? (
+        <p>جاري التحميل...</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الاسم</th>
+              <th>تاريخ الإنشاء</th>
+              <th>إجراءات</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {paginatedItems.map((item, i) => (
+              <tr key={item.id}>
+                <td>{startIndex + i + 1}</td>
+                <td>{item.name}</td>
+                <td>{new Date(item.created_at).toLocaleDateString()}</td>
+                <td>
+                  <button onClick={() => fetchItemDetails(item.id)} title="عرض">
+                    <FaEye />
+                  </button>
+                  <button onClick={() => handleEdit(item)} title="تعديل">
+                    <FaEdit />
+                  </button>
+                  <button onClick={() => handleDelete(item)} title="حذف">
+                    <FaTrash />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
-      {/* Pagination Controls */}
+      {/* Pagination */}
       <div className={styles.pagination}>
         {Array.from({ length: totalPages }, (_, index) => (
           <button
@@ -170,22 +226,23 @@ const Items = () => {
         ))}
       </div>
 
-      {/* Add Modal */}
-      {showCreateModal && (
+      {/* Add | Edit Modal */}
+      {showForm && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
-            <h3>إضافة عنصر جديد</h3>
-            <form onSubmit={submitCreate}>
+            <h3>{isEditing ? "تعديل عنصر" : "إضافة عنصر"}</h3>
+            <form onSubmit={handleSubmit}>
               <input
                 type="text"
-                placeholder="الاسم"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
+                placeholder="اسم العنصر"
+                required
               />
-              <button type="submit">إضافة</button>
-              <button type="button" onClick={() => setShowCreateModal(false)}>
+              <button type="submit">{isEditing ? "تحديث" : "إضافة"}</button>
+              <button type="button" onClick={() => setShowForm(false)}>
                 إلغاء
               </button>
             </form>
@@ -193,39 +250,23 @@ const Items = () => {
         </div>
       )}
 
-      {/* Edit Modal */}
-      {showEditModal && selectedItem && (
+      {/* Show Modal */}
+      {showViewModal && selectedItem && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
-            <h3>تعديل العنصر</h3>
-            <form onSubmit={submitEdit}>
-              <input
-                type="text"
-                placeholder="الاسم"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-              />
-              <button type="submit">حفظ</button>
-              <button type="button" onClick={() => setShowEditModal(false)}>
-                إلغاء
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Modal */}
-      {showDeleteModal && selectedItem && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3>تأكيد الحذف</h3>
+            <h3>تفاصيل العنصر</h3>
             <p>
-              هل أنت متأكد من حذف العنصر <strong>{selectedItem.name}</strong>؟
+              <strong>الاسم:</strong> {selectedItem.name}
             </p>
-            <button onClick={confirmDelete}>تأكيد</button>
-            <button onClick={() => setShowDeleteModal(false)}>إلغاء</button>
+            <p>
+              <strong>تاريخ الإنشاء:</strong>{" "}
+              {new Date(selectedItem.created_at).toLocaleString()}
+            </p>
+            <p>
+              <strong>آخر تحديث:</strong>{" "}
+              {new Date(selectedItem.updated_at || "").toLocaleString()}
+            </p>
+            <button onClick={() => setShowViewModal(false)}>إغلاق</button>
           </div>
         </div>
       )}
