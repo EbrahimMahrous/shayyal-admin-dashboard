@@ -8,6 +8,8 @@ import {
   FaToggleOn,
   FaToggleOff,
 } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 type Customer = {
   id: number;
@@ -23,7 +25,9 @@ type Customer = {
 
 const Customers = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -40,9 +44,12 @@ const Customers = () => {
   const token = localStorage.getItem("admin_token");
 
   const fetchCustomers = async () => {
-    const res = await fetch("https://otmove.online/api/v1/dashboard/customers", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetch(
+      "https://otmove.online/api/v1/dashboard/customers",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     const data = await res.json();
     if (data.success) setCustomers(data.customers.data);
   };
@@ -67,8 +74,41 @@ const Customers = () => {
   };
 
   const handleDelete = (customer: Customer) => {
-    setSelectedCustomer(customer);
-    setShowDeleteModal(true);
+    Swal.fire({
+      title: "هل أنت متأكد؟",
+      text: `لن تتمكن من التراجع عن حذف العميل ${customer.name}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "نعم، احذفه",
+      cancelButtonText: "إلغاء",
+      customClass: {
+        popup: styles.swal_popup,
+        title: styles.swal_title,
+        confirmButton: styles.swal_confirm_btn,
+        cancelButton: styles.swal_cancel_btn,
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch(
+            `https://otmove.online/api/v1/dashboard/customers/${customer.id}`,
+            {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const data = await res.json();
+          if (data.success) {
+            toast.success("تم حذف العميل بنجاح");
+            fetchCustomers();
+          } else {
+            toast.error(data.message || "فشل في حذف العميل");
+          }
+        } catch (error) {
+          toast.error("حدث خطأ أثناء حذف العميل");
+        }
+      }
+    });
   };
 
   const handleToggleStatus = async (customerId: number) => {
@@ -98,19 +138,30 @@ const Customers = () => {
   const submitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCustomer) return;
-    await fetch(
-      `https://otmove.online/api/v1/dashboard/customers/${selectedCustomer.id}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(editFormData),
+
+    try {
+      const res = await fetch(
+        `https://otmove.online/api/v1/dashboard/customers/${selectedCustomer.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(editFormData),
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        toast.success("تم تعديل بيانات العميل بنجاح");
+        setShowEditModal(false);
+        fetchCustomers();
+      } else {
+        toast.error(data.message || "فشل في تعديل البيانات");
       }
-    );
-    setShowEditModal(false);
-    fetchCustomers();
+    } catch (error) {
+      toast.error("حدث خطأ أثناء التعديل");
+    }
   };
 
   // Filter + Pagination
@@ -164,7 +215,11 @@ const Customers = () => {
               <td>{c.otp}</td>
               <td>
                 <button onClick={() => handleToggleStatus(c.id)}>
-                  {c.status === "1" ? <FaToggleOn color="green" /> : <FaToggleOff color="gray" />}
+                  {c.status === "1" ? (
+                    <FaToggleOn color="green" />
+                  ) : (
+                    <FaToggleOff color="gray" />
+                  )}
                 </button>
               </td>
               <td>{new Date(c.created_at).toLocaleDateString()}</td>
@@ -202,11 +257,22 @@ const Customers = () => {
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <h3>تفاصيل العميل</h3>
-            <p><strong>الاسم:</strong> {selectedCustomer.name}</p>
-            <p><strong>الهاتف:</strong> {selectedCustomer.phone}</p>
-            <p><strong>العنوان:</strong> {selectedCustomer.address}</p>
-            <p><strong>OTP:</strong> {selectedCustomer.otp}</p>
-            <p><strong>تاريخ الإنشاء:</strong> {new Date(selectedCustomer.created_at).toLocaleString()}</p>
+            <p>
+              <strong>الاسم:</strong> {selectedCustomer.name}
+            </p>
+            <p>
+              <strong>الهاتف:</strong> {selectedCustomer.phone}
+            </p>
+            <p>
+              <strong>العنوان:</strong> {selectedCustomer.address}
+            </p>
+            <p>
+              <strong>OTP:</strong> {selectedCustomer.otp}
+            </p>
+            <p>
+              <strong>تاريخ الإنشاء:</strong>{" "}
+              {new Date(selectedCustomer.created_at).toLocaleString()}
+            </p>
             <button onClick={() => setShowDetailsModal(false)}>إغلاق</button>
           </div>
         </div>

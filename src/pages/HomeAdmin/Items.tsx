@@ -2,10 +2,8 @@ import { useEffect, useState } from "react";
 import styles from "../../styles/Components/Modal.module.css";
 import { FaEdit, FaTrash, FaPlus, FaEye } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
-// Types
 interface Item {
   id: number;
   name: string;
@@ -160,7 +158,6 @@ const Items = () => {
 
   return (
     <div className={styles.container}>
-      <ToastContainer position="top-left" autoClose={3000} />
       <div className={styles.header}>
         <h2>إدارة العناصر</h2>
       </div>

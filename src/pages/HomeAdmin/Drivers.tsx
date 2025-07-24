@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// ** Styles
 import styles from "../../styles/Components/Modal.module.css";
 import {
   FaEye,
@@ -8,6 +7,8 @@ import {
   FaToggleOn,
   FaToggleOff,
 } from "react-icons/fa";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 interface Driver {
   id: number;
@@ -30,8 +31,11 @@ const Drivers = () => {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
-  const [editFormData, setEditFormData] = useState({
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const [editFormData, setEditFormData] = useState<any>({
     name: "",
     phone: "",
     address: "",
@@ -39,11 +43,8 @@ const Drivers = () => {
     car_license: "",
     car_type: "",
     car_dimensions: "",
+    image: null,
   });
-
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
 
   const token = localStorage.getItem("admin_token");
 
@@ -80,46 +81,76 @@ const Drivers = () => {
       car_license: driver.car_license,
       car_type: driver.car_type,
       car_dimensions: driver.car_dimensions,
+      image: null,
     });
     setShowEdit(true);
   };
 
   const handleDelete = (driver: Driver) => {
     setSelectedDriver(driver);
-    setShowDelete(true);
+    confirmDelete(driver);
   };
 
-  const confirmDelete = async () => {
-    if (!selectedDriver) return;
-    await fetch(
-      `https://otmove.online/api/v1/dashboard/drivers/${selectedDriver.id}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    setShowDelete(false);
-    fetchDrivers();
+  const confirmDelete = async (driver: Driver) => {
+    const result = await Swal.fire({
+      title: "هل أنت متأكد؟",
+      text: `سيتم حذف السائق ${driver.name}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "نعم، احذفه",
+      cancelButtonText: "إلغاء",
+      customClass: {
+        popup: styles.swal_popup,
+        title: styles.swal_title,
+        confirmButton: styles.swal_confirm_btn,
+        cancelButton: styles.swal_cancel_btn,
+      },
+    });
+
+    if (result.isConfirmed) {
+      await fetch(
+        `https://otmove.online/api/v1/dashboard/drivers/${driver.id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success("تم حذف السائق");
+      fetchDrivers();
+    }
   };
 
   const submitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDriver) return;
+
+    const form = new FormData();
+    form.append("name", editFormData.name);
+    form.append("phone", editFormData.phone);
+    form.append("address", editFormData.address);
+    form.append("car_number", editFormData.car_number);
+    form.append("car_license", editFormData.car_license);
+    form.append("car_type", editFormData.car_type);
+    form.append("car_dimensions", editFormData.car_dimensions);
+    if (editFormData.image) {
+      form.append("image", editFormData.image);
+    }
+
     await fetch(
       `https://otmove.online/api/v1/dashboard/drivers/${selectedDriver.id}`,
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editFormData),
+        body: form,
       }
     );
+    toast.success("تم تحديث البيانات بنجاح");
     setShowEdit(false);
     fetchDrivers();
   };
-  //  Filter + Pagination
+
   const filteredDrivers = drivers.filter((d) =>
     d.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -154,6 +185,7 @@ const Drivers = () => {
             <th>#</th>
             <th>الاسم</th>
             <th>الهاتف</th>
+
             <th>السيارة</th>
             <th>الرخصة</th>
             <th>النوع</th>
@@ -168,6 +200,7 @@ const Drivers = () => {
               <td>{startIndex + i + 1}</td>
               <td>{d.name}</td>
               <td>{d.phone}</td>
+
               <td>{d.car_number}</td>
               <td>{d.car_license}</td>
               <td>{d.car_type}</td>
@@ -203,7 +236,6 @@ const Drivers = () => {
         </tbody>
       </table>
 
-      {/* Pagination Controls */}
       <div className={styles.pagination}>
         {Array.from({ length: totalPages }, (_, index) => (
           <button
@@ -216,7 +248,6 @@ const Drivers = () => {
         ))}
       </div>
 
-      {/* Show Modal */}
       {showDetails && selectedDriver && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -246,12 +277,24 @@ const Drivers = () => {
               <strong>تاريخ الإنشاء:</strong>{" "}
               {new Date(selectedDriver.created_at).toLocaleString()}
             </p>
+            <p>
+              <strong>الصورة:</strong>
+              <br />
+              <img
+                src={`https://otmove.online/storage/${selectedDriver.image}`}
+                alt={selectedDriver.name}
+                style={{
+                  width: "150px",
+                  borderRadius: "10px",
+                  marginTop: "8px",
+                }}
+              />
+            </p>
             <button onClick={() => setShowDetails(false)}>إغلاق</button>
           </div>
         </div>
       )}
 
-      {/* Edit Modal */}
       {showEdit && selectedDriver && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -315,25 +358,20 @@ const Drivers = () => {
                 }
                 placeholder="الأبعاد"
               />
+              <input
+                type="file"
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    image: e.target.files?.[0],
+                  })
+                }
+              />
               <button type="submit">حفظ</button>
               <button type="button" onClick={() => setShowEdit(false)}>
                 إلغاء
               </button>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Modal */}
-      {showDelete && selectedDriver && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3>تأكيد الحذف</h3>
-            <p>
-              هل أنت متأكد من حذف السائق <strong>{selectedDriver.name}</strong>؟
-            </p>
-            <button onClick={confirmDelete}>تأكيد</button>
-            <button onClick={() => setShowDelete(false)}>إلغاء</button>
           </div>
         </div>
       )}
