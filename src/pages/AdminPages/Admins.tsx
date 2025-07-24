@@ -1,4 +1,4 @@
-import { useEffect, useState, type SetStateAction } from "react";
+import { useEffect, useState } from "react";
 import {
   FaEye,
   FaEdit,
@@ -6,10 +6,12 @@ import {
   FaToggleOn,
   FaToggleOff,
 } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import styles from "../../styles/Components/Modal.module.css";
 
 type Admin = {
-  id: number | string;
+  id: number;
   name: string;
   email: string;
   status: string;
@@ -21,11 +23,14 @@ const Admins = () => {
   const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "",
+    password_confirmation: "",
+    role_id: 1,
   });
 
   const token = localStorage.getItem("admin_token");
@@ -42,7 +47,7 @@ const Admins = () => {
     fetchAdmins();
   }, []);
 
-  const handleShow = async (id: string | number) => {
+  const handleShow = async (id: number) => {
     const res = await fetch(
       `https://otmove.online/api/v1/dashboard/admins/${id}`,
       {
@@ -57,68 +62,129 @@ const Admins = () => {
   };
 
   const handleCreate = () => {
-    setFormData({ name: "", email: "" });
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      password_confirmation: "",
+      role_id: 1,
+    });
     setIsEditing(false);
     setShowFormModal(true);
   };
 
   const handleEdit = (admin: Admin) => {
-    if (!admin) return;
-    setFormData({ name: admin.name, email: admin.email });
+    setFormData({
+      name: admin.name,
+      email: admin.email,
+      password: "",
+      password_confirmation: "",
+      role_id: 1,
+    });
     setSelectedAdmin(admin);
     setIsEditing(true);
     setShowFormModal(true);
   };
 
-  const handleDelete = (admin: SetStateAction<Admin | null>) => {
-    setSelectedAdmin(admin);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!selectedAdmin) return;
-    await fetch(
-      `https://otmove.online/api/v1/dashboard/admins/${selectedAdmin.id}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+  const handleDelete = (admin: Admin) => {
+    Swal.fire({
+      title: `هل أنت متأكد من حذف ${admin.name}؟`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "نعم، احذف",
+      cancelButtonText: "إلغاء",
+      customClass: {
+        popup: styles.swal_popup,
+        title: styles.swal_title,
+        confirmButton: styles.swal_confirm_btn,
+        cancelButton: styles.swal_cancel_btn,
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const res = await fetch(
+          `https://otmove.online/api/v1/dashboard/admins/${admin.id}`,
+          {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const data = await res.json();
+        if (res.ok && data.success) {
+          toast.success("تم حذف المشرف بنجاح.");
+          fetchAdmins();
+        } else {
+          toast.error(`فشل الحذف! ${data.message || "حدث خطأ"}`);
+        }
       }
-    );
-    setShowDeleteModal(false);
-    fetchAdmins();
+    });
   };
 
-  const handleStatusToggle = async (id: string | number) => {
-    await fetch(
+  const handleStatusToggle = async (
+    id: number,
+    currentStatus: string | number
+  ) => {
+    const newStatus = currentStatus == "1" ? "0" : "1";
+
+    const res = await fetch(
       `https://otmove.online/api/v1/dashboard/admins/change_status/${id}`,
       {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
       }
     );
-    fetchAdmins();
+
+    if (res.ok) {
+      await fetchAdmins();
+      toast.success("تم تغيير الحالة بنجاح");
+    } else {
+      toast.error("فشل تغيير الحالة");
+    }
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const url = isEditing
-      ? selectedAdmin
-        ? `https://otmove.online/api/v1/dashboard/admins/${selectedAdmin.id}`
-        : ""
+      ? `https://otmove.online/api/v1/dashboard/admins/${selectedAdmin?.id}`
       : "https://otmove.online/api/v1/dashboard/admins";
-    if (isEditing && !selectedAdmin) return;
 
-    await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
 
-    setShowFormModal(false);
-    fetchAdmins();
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        Swal.fire({
+          icon: "success",
+          title: isEditing ? "تم التحديث بنجاح" : "تم إنشاء المشرف بنجاح",
+          showConfirmButton: false,
+          timer: 2000,
+          customClass: {
+            popup: styles.swal_popup,
+            title: styles.swal_title,
+            confirmButton: styles.swal_confirm_btn,
+            cancelButton: styles.swal_cancel_btn,
+          },
+        });
+        setShowFormModal(false);
+        fetchAdmins();
+      } else {
+        toast.error(data.message || "فشل العملية!");
+      }
+    } catch (error) {
+      toast.error("حدث خطأ أثناء الاتصال بالسيرفر");
+    }
   };
 
   return (
@@ -148,8 +214,10 @@ const Admins = () => {
               <td>{admin.name}</td>
               <td>{admin.email}</td>
               <td>
-                <button onClick={() => handleStatusToggle(admin.id)}>
-                  {admin.status === "1" ? (
+                <button
+                  onClick={() => handleStatusToggle(admin.id, admin.status)}
+                >
+                  {String(admin.status) === "1" ? (
                     <FaToggleOn color="green" />
                   ) : (
                     <FaToggleOff color="gray" />
@@ -172,8 +240,6 @@ const Admins = () => {
           ))}
         </tbody>
       </table>
-
-      {/* Add Modal */}
       {showFormModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -197,6 +263,45 @@ const Admins = () => {
                 }
                 required
               />
+              {!isEditing && (
+                <>
+                  <input
+                    type="password"
+                    placeholder="كلمة المرور"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    required
+                  />
+                  <input
+                    type="password"
+                    placeholder="تأكيد كلمة المرور"
+                    value={formData.password_confirmation}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        password_confirmation: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </>
+              )}
+              <select
+                className={styles.roleSelect}
+                value={formData.role_id}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    role_id: parseInt(e.target.value),
+                  })
+                }
+              >
+                <option value={1}>أدمن</option>
+                <option value={2}>مشرف</option>
+              </select>
+
               <button type="submit">{isEditing ? "تحديث" : "إضافة"}</button>
               <button
                 type="button"
@@ -209,8 +314,6 @@ const Admins = () => {
           </div>
         </div>
       )}
-
-      {/* Show Modal */}
       {showDetailsModal && selectedAdmin && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -235,29 +338,6 @@ const Admins = () => {
             >
               إغلاق
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Modal */}
-      {showDeleteModal && selectedAdmin && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3>هل أنت متأكد من حذف هذا المشرف؟</h3>
-            <p>
-              الاسم: <strong>{selectedAdmin.name}</strong>
-            </p>
-            <div className={styles.modalActions}>
-              <button onClick={confirmDelete} className={styles.confirmButton}>
-                حذف
-              </button>
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className={styles.cancelButton}
-              >
-                إلغاء
-              </button>
-            </div>
           </div>
         </div>
       )}

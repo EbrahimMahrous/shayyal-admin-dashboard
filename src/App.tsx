@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 export default function App() {
   return (
     <AuthProvider>
-      <ToastContainer position="top-left" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={3000} />
       <Router basename="/shayyal-admin-dashboard/">
         <Routers />
       </Router>
