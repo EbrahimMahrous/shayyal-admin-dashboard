@@ -1,7 +1,8 @@
-
 import styles from "../../styles/Components/Modal.module.css";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 interface Role {
   id: number;
@@ -9,11 +10,20 @@ interface Role {
   display_name: string | null;
   description: string | null;
   created_at: string;
+  permissions?: Permission[];
+}
+
+interface Permission {
+  id: number;
+  name: string;
+  display_name: string;
 }
 
 export default function Roles() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  // const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     display_name: "",
@@ -21,10 +31,10 @@ export default function Roles() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const rolesPerPage = 5;
   const token = localStorage.getItem("admin_token");
 
   const fetchRoles = async () => {
@@ -37,6 +47,7 @@ export default function Roles() {
 
   useEffect(() => {
     fetchRoles();
+    // fetchPermissions();
   }, []);
 
   const handleShow = async (id: number) => {
@@ -54,32 +65,41 @@ export default function Roles() {
   };
 
   const handleDelete = (role: Role) => {
-    setSelectedRole(role);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!selectedRole) return;
-    try {
-      const res = await fetch(
-        `https://otmove.online/api/v1/dashboard/roles/${selectedRole.id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
+    Swal.fire({
+      title: "هل أنت متأكد؟",
+      text: `سيتم حذف الدور (${role.display_name || role.name}) بشكل نهائي!`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "نعم، احذفه!",
+      cancelButtonText: "إلغاء",
+      customClass: {
+        popup: styles.swal_popup,
+        title: styles.swal_title,
+        confirmButton: styles.swal_confirm_btn,
+        cancelButton: styles.swal_cancel_btn,
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch(
+            `https://otmove.online/api/v1/dashboard/roles/${role.id}`,
+            {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const data = await res.json();
+          if (data.success) {
+            toast.success("تم حذف الدور بنجاح.");
+            fetchRoles();
+          } else {
+            toast.error("فشل في الحذف، حاول لاحقًا.");
+          }
+        } catch (err) {
+          toast.error("حدث خطأ أثناء الاتصال بالخادم.");
         }
-      );
-      const data = await res.json();
-      if (data.success) {
-        fetchRoles();
-        setMessage("تم الحذف بنجاح");
-      } else {
-        setError("فشل في الحذف، حاول لاحقاً");
       }
-    } catch (err) {
-      setError("حدث خطأ في الاتصال بالخادم");
-    } finally {
-      setShowDeleteModal(false);
-    }
+    });
   };
 
   const handleEdit = (role: Role) => {
@@ -89,6 +109,7 @@ export default function Roles() {
       display_name: role.display_name || "",
       description: role.description || "",
     });
+    setSelectedPermissions(role.permissions?.map((p) => p.id) || []);
     setSelectedRole(role);
     setShowFormModal(true);
   };
@@ -96,6 +117,7 @@ export default function Roles() {
   const handleCreate = () => {
     setIsEditing(false);
     setFormData({ name: "", display_name: "", description: "" });
+    setSelectedPermissions([]);
     setShowFormModal(true);
   };
 
@@ -106,6 +128,11 @@ export default function Roles() {
       : "https://otmove.online/api/v1/dashboard/roles";
     const method = isEditing ? "PUT" : "POST";
 
+    const body = {
+      ...formData,
+      permissions: selectedPermissions,
+    };
+
     try {
       const res = await fetch(url, {
         method,
@@ -113,21 +140,41 @@ export default function Roles() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
       if (data.success) {
-        setMessage(isEditing ? "تم التحديث بنجاح" : "تم الإضافة بنجاح");
+        toast.success(isEditing ? "تم التحديث بنجاح" : "تم الإضافة بنجاح");
         fetchRoles();
         setShowFormModal(false);
       } else {
-        setError("فشل في الحفظ، تحقق من البيانات");
+        toast.error("فشل في الحفظ، تحقق من البيانات");
       }
     } catch (err) {
-      setError("خطأ في الاتصال بالخادم");
+      toast.error("خطأ في الاتصال بالخادم");
     }
   };
+
+  // const togglePermission = (id: number) => {
+  //   if (selectedPermissions.includes(id)) {
+  //     setSelectedPermissions(selectedPermissions.filter((pid) => pid !== id));
+  //   } else {
+  //     setSelectedPermissions([...selectedPermissions, id]);
+  //   }
+  // };
+
+  const filteredRoles = roles.filter((role) =>
+    (role.name + role.display_name + role.description)
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredRoles.length / rolesPerPage);
+  const currentRoles = filteredRoles.slice(
+    (currentPage - 1) * rolesPerPage,
+    currentPage * rolesPerPage
+  );
 
   return (
     <div className={styles.container}>
@@ -137,7 +184,13 @@ export default function Roles() {
           إضافة دور جديد
         </button>
       </div>
-
+      <input
+        type="text"
+        placeholder="بحث..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className={styles.searchInput}
+      />
       <table className={styles.table}>
         <thead>
           <tr>
@@ -149,9 +202,9 @@ export default function Roles() {
           </tr>
         </thead>
         <tbody>
-          {roles.map((role, i) => (
+          {currentRoles.map((role, i) => (
             <tr key={role.id}>
-              <td>{i + 1}</td>
+              <td>{(currentPage - 1) * rolesPerPage + i + 1}</td>
               <td>{role.display_name || role.name}</td>
               <td>{role.description || "-"}</td>
               <td>{new Date(role.created_at).toLocaleDateString()}</td>
@@ -171,8 +224,17 @@ export default function Roles() {
         </tbody>
       </table>
 
-      {message && <div className={styles.successMessage}>{message}</div>}
-      {error && <div className={styles.errorMessage}>{error}</div>}
+      <div className={styles.pagination}>
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            className={currentPage === i + 1 ? styles.activePage : ""}
+            onClick={() => setCurrentPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
 
       {showFormModal && (
         <div className={styles.modalOverlay}>
@@ -203,6 +265,23 @@ export default function Roles() {
                   setFormData({ ...formData, description: e.target.value })
                 }
               ></textarea>
+
+              {/* <div className={styles.permissionsContainer}>
+                <h4>الصلاحيات:</h4>
+                <div className={styles.permissionsList}>
+                  {permissions.map((perm) => (
+                    <label key={perm.id}>
+                      <input
+                        type="checkbox"
+                        checked={selectedPermissions.includes(perm.id)}
+                        onChange={() => togglePermission(perm.id)}
+                      />
+                      {perm.display_name}
+                    </label>
+                  ))}
+                </div>
+              </div> */}
+
               <button type="submit">{isEditing ? "تحديث" : "إنشاء"}</button>
               <button type="button" onClick={() => setShowFormModal(false)}>
                 إلغاء
@@ -223,25 +302,17 @@ export default function Roles() {
             <p>
               <strong>الوصف:</strong> {selectedRole.description || "-"}
             </p>
+            {selectedRole.permissions?.length && (
+              <div>
+                <strong>الصلاحيات:</strong>
+                <ul>
+                  {selectedRole.permissions.map((perm) => (
+                    <li key={perm.id}>{perm.display_name}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <button onClick={() => setShowDetailsModal(false)}>إغلاق</button>
-          </div>
-        </div>
-      )}
-
-      {showDeleteModal && selectedRole && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3>هل أنت متأكد من حذف الدور؟</h3>
-            <p>
-              اسم الدور:{" "}
-              <strong>{selectedRole.display_name || selectedRole.name}</strong>
-            </p>
-            <div className={styles.modalActions}>
-              <button onClick={confirmDelete} className={styles.deleteButton}>
-                حذف
-              </button>
-              <button onClick={() => setShowDeleteModal(false)}>إلغاء</button>
-            </div>
           </div>
         </div>
       )}
