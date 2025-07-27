@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "../../styles/Pages/Admin/settings.module.css";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 type SettingsData = {
   whatsapp: string;
@@ -21,7 +23,6 @@ export default function Settings() {
     email: "",
     shayyal_tax: "",
   });
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetch("https://otmove.online/api/v1/dashboard/settings", {
@@ -30,7 +31,14 @@ export default function Settings() {
       },
     })
       .then((res) => res.json())
-      .then((json) => setForm(json.setting));
+      .then((json) => {
+        if (json.success && json.setting) {
+          setForm(json.setting);
+        } else {
+          toast.error(" فشل تحميل الإعدادات");
+        }
+      })
+      .catch(() => toast.error(" فشل تحميل الإعدادات"));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,19 +58,30 @@ export default function Settings() {
 
       const data = await res.json();
       if (data.success) {
-        setMessage("✅ تم حفظ الإعدادات بنجاح");
+        await Swal.fire({
+          icon: "success",
+          title: "تم الحفظ",
+          text: " تم حفظ الإعدادات بنجاح",
+          confirmButtonText: "حسنًا",
+          customClass: {
+            popup: styles.swal_popup,
+            title: styles.swal_title,
+            confirmButton: styles.swal_confirm_btn,
+            cancelButton: styles.swal_cancel_btn,
+          },
+        });
       } else {
-        setMessage("❌ حدث خطأ أثناء الحفظ");
+        toast.error(" حدث خطأ أثناء الحفظ");
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ حدث خطأ أثناء الحفظ");
+      toast.error(" حدث خطأ أثناء الحفظ");
     }
   };
 
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
-      <h2 className={styles.title}>إعدادات النظام</h2>
+      <h2 className={styles.title}>تحديث اعدادات النظام</h2>
 
       <div className={styles.grid}>
         <div className={styles.inputGroup}>
@@ -133,8 +152,6 @@ export default function Settings() {
       <button className={styles.button} type="submit">
         حفظ الإعدادات
       </button>
-
-      {message && <p className={styles.message}>{message}</p>}
     </form>
   );
 }

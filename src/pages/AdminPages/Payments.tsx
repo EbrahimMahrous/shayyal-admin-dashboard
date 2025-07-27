@@ -37,7 +37,9 @@ export default function Payments() {
     let data = [...payments];
 
     if (filterMethod !== "all") {
-      data = data.filter((p) => p.payment_method.toLowerCase() === filterMethod);
+      data = data.filter(
+        (p) => p.payment_method.toLowerCase() === filterMethod
+      );
     }
 
     if (search) {
@@ -59,7 +61,10 @@ export default function Payments() {
 
   return (
     <div className={styles.paymentsContainer}>
-      <h2 className={styles.title}>المدفوعات</h2>
+      <div className={styles.header}>
+        <h2>المدفوعات</h2>
+      </div>
+
       <div className={styles.filters}>
         <input
           type="text"
@@ -111,10 +116,7 @@ export default function Payments() {
 
       <div className={styles.pagination}>
         {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-          >
+          <button key={i} onClick={() => setCurrentPage(i + 1)}>
             {i + 1}
           </button>
         ))}

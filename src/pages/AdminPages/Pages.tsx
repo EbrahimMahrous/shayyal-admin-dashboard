@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "../../styles/Pages/Admin/Pages.module.css";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 type Pages = {
   who_are_we: string;
@@ -23,14 +25,22 @@ export default function Pages() {
   });
 
   const [activeTab, setActiveTab] = useState<PageKey>("who_are_we");
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetch("https://otmove.online/api/v1/dashboard/pages", {
       headers: { Authorization: `Bearer ${localStorage.admin_token}` },
     })
       .then((res) => res.json())
-      .then((json) => setForm(json.page));
+      .then((json) => {
+        if (json.success) {
+          setForm(json.page);
+        } else {
+          toast.error(" فشل تحميل البيانات");
+        }
+      })
+      .catch(() => {
+        toast.error(" فشل تحميل البيانات");
+      });
   }, []);
 
   const handleChange = (value: string) => {
@@ -53,13 +63,24 @@ export default function Pages() {
       );
       const data = await res.json();
       if (data.success) {
-        setMessage("✅ تم حفظ الإعدادات بنجاح");
+        await Swal.fire({
+          icon: "success",
+          title: "تم الحفظ",
+          text: " تم حفظ محتوى الصفحة بنجاح",
+          confirmButtonText: "حسنًا",
+          customClass: {
+            popup: styles.swal_popup,
+            title: styles.swal_title,
+            confirmButton: styles.swal_confirm_btn,
+            cancelButton: styles.swal_cancel_btn,
+          },
+        });
       } else {
-        setMessage("❌ حدث خطأ أثناء الحفظ");
+        toast.error(" حدث خطأ أثناء الحفظ");
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ حدث خطأ أثناء الحفظ");
+      toast.error(" حدث خطأ أثناء الحفظ");
     }
   };
 
@@ -95,8 +116,6 @@ export default function Pages() {
       <button className={styles.button} type="submit">
         حفظ التغييرات
       </button>
-
-      {message && <p className={styles.message}>{message}</p>}
     </form>
   );
 }

@@ -1,15 +1,15 @@
 // ** Style
 import styles from "../../styles/Pages/LandingPage/Features.module.css";
-// ** Assets
-// ** Hooks
 
 const featuresData = [
-  "لوحة تحكم ديناميكية وسهلة الاستخدام",
-  "متابعة الطلبات والحجوزات لحظيًا",
-  "إشعارات فورية لتنبيهات النظام",
-  "تحليلات وتقارير مفصّلة لأداء التطبيق",
-  "دعم فني مباشر وتحديثات مستمرة",
-  "تصميم متجاوب يعمل على كل الأجهزة",
+  "منصة سهلة الاستخدام بواجهة عربية مبسطة.",
+  "لوحة تحكم تفاعلية تتيح متابعة الطلبات والحجوزات لحظيًا.",
+  "إشعارات فورية لتنبيه السائقين والعملاء.",
+  "نظام تقييم ومراجعات لتحسين الجودة باستمرار.",
+  "تقارير وتحليلات مفصلة لأداء الخدمات.",
+  "دعم فني متوفر على مدار الساعة.",
+  "تصميم متجاوب يعمل على جميع الأجهزة.",
+  "دمج تقنيات الذكاء الاصطناعي والتتبع لتجربة أكثر ذكاء وفعالية.",
 ];
 
 export default function Features() {
@@ -17,7 +17,7 @@ export default function Features() {
     <section className={styles.featuresSection}>
       <div className={styles.container}>
         <h2 className={styles.title}>
-          مميزات <span>شيّال</span>
+          مميزات <span className={styles.brand}>OTM</span>
         </h2>
         <ul className={styles.featuresList}>
           {featuresData.map((feature, index) => (

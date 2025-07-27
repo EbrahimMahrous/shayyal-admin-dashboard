@@ -1,7 +1,7 @@
 // ** Styles
 import styles from "../styles/Components/NavBar.module.css";
 // ** Assets
-import shayyalLogo from "../assets/Pages/shayyalLogo.png";
+import OTMLogo from "../assets/Pages/OTM.svg";
 // ** Hooks
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -48,7 +48,7 @@ export default function NavBar() {
           ))}
         </ul>
         <div className={styles.logo} onClick={() => navigate("/")}>
-          <img src={shayyalLogo} alt="Shayyal Logo" />
+          <img src={OTMLogo} alt="Shayyal Logo" />
         </div>
       </nav>
     </div>

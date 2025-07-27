@@ -1,22 +1,27 @@
-/* Start Variables */
 :root {
-  /* Primary Brand Colors */
-  --main-color: #dc747d;
-  --main-color-light: #fbeaec;
-  --main-color-dark: #b85a62;
+  /* Brand Colors */
+  --main-color: #e94e1c;
+  --main-color-light: #fff1ec;
+  --main-color-dark: #b93e17;
 
-  /* Secondary / Neutral Colors */
-  --secondary-color: #f0f0f0;
+  /* Secondary Colors */
+  --secondary-color: #575756;
+  --accent-color: #ffffff;
+
+  /* Typography */
   --text-color: #333;
   --text-light: #666;
   --bg-color: #ffffff;
   --bg-alt-color: #f9f9f9;
 
-  /* Shadow & Border */
-  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --border-radius: 10px;
+  /* Layout & Design */
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --border-radius: 12px;
+
+  /* Font */
+  --font-main: "Cairo", sans-serif;
 }
-/* End Variables */
+
 body {
   margin: 0;
   padding: 0;

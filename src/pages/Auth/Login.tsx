@@ -1,5 +1,6 @@
 // ** Styles
 import styles from "../../styles/Auth/Login.module.css";
+
 // ** Hooks
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,10 +13,13 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
+
     try {
       const response = await fetch(
         "https://otmove.online/api/v1/dashboard/login",
@@ -27,7 +31,9 @@ export default function Login() {
           body: JSON.stringify({ email, password }),
         }
       );
+
       const data = await response.json();
+
       if (response.ok && data.success) {
         const token = data.token;
         const { name, email } = data.admin;
@@ -35,6 +41,7 @@ export default function Login() {
         localStorage.setItem("admin_token", token);
         localStorage.setItem("admin_name", name);
         localStorage.setItem("admin_email", email);
+
         login();
         navigate("/admin");
       } else {
@@ -43,6 +50,8 @@ export default function Login() {
     } catch (err) {
       console.error("Login error:", err);
       setError("حدث خطأ أثناء محاولة تسجيل الدخول");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,8 +82,8 @@ export default function Login() {
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <button type="submit" className={styles.button}>
-          تسجيل الدخول
+        <button type="submit" className={styles.button} disabled={loading}>
+          {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
         </button>
       </form>
     </div>

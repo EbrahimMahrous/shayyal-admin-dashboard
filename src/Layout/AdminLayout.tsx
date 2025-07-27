@@ -8,6 +8,12 @@ import manageAdmins from "../assets/Pages/management-admins.svg";
 import payment from "../assets/Pages/payment.svg";
 import settings from "../assets/Pages/settings.svg";
 import pages from "../assets/Pages/pages.svg";
+import customers from "../assets/Pages/mangeCustomers.svg";
+// import profile from "../assets/Pages/profile.png";
+import profile1 from "../assets/Pages/1.png";
+import order from "../assets/Pages/order.svg";
+import item from "../assets/Pages/item.svg";
+import providers from "../assets/Pages/providers.svg";
 // ** Hooks
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 // ** Auth
@@ -29,6 +35,11 @@ export default function AdminLayout() {
           className={style.adminInfo}
           onClick={() => navigate("/admin/profile")}
         >
+          <img
+            src={localStorage.getItem("admin_image") || profile1}
+            alt="admin-profile"
+            className={style.adminAvatar}
+          />
           <h2>
             اهلا بيك <br />
             {localStorage.getItem("admin_name")}
@@ -37,49 +48,100 @@ export default function AdminLayout() {
         <div className={style.adminLayout_content}>
           <div
             onClick={() => navigate("/admin")}
-            className={isActive("/admin") ? style.active : ""}
+            className={`${style.menuItem} ${
+              isActive("/admin") ? style.active : ""
+            }`}
           >
             <img src={mainIcon} alt="home-icon" />
             <p>الرئيسية</p>
           </div>
           <div
             onClick={() => navigate("/admin/roles")}
-            className={isActive("/admin/roles") ? style.active : ""}
+            className={`${style.menuItem} ${
+              isActive("/admin/roles") ? style.active : ""
+            }`}
           >
             <img src={roles} alt="roles-icon" />
             <p>إدارة الأدوار</p>
           </div>
           <div
             onClick={() => navigate("/admin/admins")}
-            className={isActive("/admin/admins") ? style.active : ""}
+            className={`${style.menuItem} ${
+              isActive("/admin/admins") ? style.active : ""
+            }`}
           >
             <img src={manageAdmins} alt="manageAdmins-icon" />
             <p>إدارة المشرفين</p>
           </div>
 
           <div
-            onClick={() => navigate("/admin/payment")}
-            className={isActive("/admin/payment") ? style.active : ""}
+            onClick={() => navigate("/admin/customers")}
+            className={`${style.menuItem} ${
+              isActive("/admin/customers") ? style.active : ""
+            }`}
           >
-            <img src={payment} alt="payment-icon" />
-            <p>المدفوعات</p>
+            <img src={customers} alt="customer" />
+            <p>المستخدمين</p>
           </div>
 
           <div
+            onClick={() => navigate("/admin/orders")}
+            className={`${style.menuItem} ${
+              isActive("/admin/orders") ? style.active : ""
+            }`}
+          >
+            <img src={order} alt="order" />
+            <p>اداره الطلبات</p>
+          </div>
+
+          <div
+            onClick={() => navigate("/admin/drivers")}
+            className={`${style.menuItem} ${
+              isActive("/admin/drivers") ? style.active : ""
+            }`}
+          >
+            <img src={providers} alt="" />
+
+            <p>مقدمو الخدمة</p>
+          </div>
+
+          <div
+            onClick={() => navigate("/admin/items")}
+            className={`${style.menuItem} ${
+              isActive("/admin/items") ? style.active : ""
+            }`}
+          >
+            <img src={item} alt="" />
+            <p>اداره العناصر</p>
+          </div>
+          <div
             onClick={() => navigate("/admin/pages")}
-            className={isActive("/admin/pages") ? style.active : ""}
+            className={`${style.menuItem} ${
+              isActive("/admin/pages") ? style.active : ""
+            }`}
           >
             <img src={pages} alt="pages-icon" />
             <p>اداره الصفحات</p>
           </div>
           <div
+            onClick={() => navigate("/admin/payment")}
+            className={`${style.menuItem} ${
+              isActive("/admin/payment") ? style.active : ""
+            }`}
+          >
+            <img src={payment} alt="payment-icon" />
+            <p>المدفوعات</p>
+          </div>
+          <div
             onClick={() => navigate("/admin/settings")}
-            className={isActive("/admin/settings") ? style.active : ""}
+            className={`${style.menuItem} ${
+              isActive("/admin/settings") ? style.active : ""
+            }`}
           >
             <img src={settings} alt="settings-icon" />
             <p>الاعدادات</p>
           </div>
-          <div onClick={handleLogout}>
+          <div onClick={handleLogout} className={style.menuItem}>
             <img src={logOut} alt="logout-home" />
             <p>تسجيل خروج</p>
           </div>

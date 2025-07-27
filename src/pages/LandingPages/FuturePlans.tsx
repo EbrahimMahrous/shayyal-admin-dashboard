@@ -1,14 +1,13 @@
 // ** Style
 import styles from "../../styles/Pages/LandingPage/FuturePlans.module.css";
-// ** Assets
-// ** Hooks
 
 const plans = [
-  "إطلاق تطبيق خاص بالمزودين بواجهة مخصصة لهم",
-  "إضافة وسائل دفع إلكتروني متعددة لتسهيل عمليات الدفع",
-  "توسيع النطاق الجغرافي لخدمة أكبر عدد من المستخدمين",
-  "تكامل ذكي مع منصات الطرف الثالث (APIs)",
-  "تحسين تجربة المستخدم باستخدام الذكاء الاصطناعي والتعلم الآلي",
+  "إطلاق تطبيق خاص لسائقي النقل بواجهة مخصصة وسهلة الاستخدام.",
+  "إضافة وسائل دفع إلكتروني متعددة لتسهيل المعاملات وتحسين تجربة المستخدم.",
+  "التوسع الجغرافي لتغطية مزيد من المدن والمناطق داخل المملكة وخارجها.",
+  "تكامل ذكي مع منصات الطرف الثالث (APIs) لتحسين سير العمليات.",
+  "استخدام الذكاء الاصطناعي في التوصيات وتحسين التتبع وتحليل البيانات.",
+  "توفير أدوات تحليلية متقدمة للمشرفين لمتابعة الأداء واتخاذ قرارات فعالة.",
 ];
 
 export default function FuturePlans() {
@@ -16,10 +15,10 @@ export default function FuturePlans() {
     <section className={styles.plansSection}>
       <div className={styles.container}>
         <h2 className={styles.title}>
-          رؤيتنا <span>المستقبلية</span>
+          خططنا <span>المستقبلية</span>
         </h2>
         <p className={styles.subtitle}>
-          نحن نعمل على تطوير مستمر لتقديم تجربة أفضل وأكثر تكاملًا لعملائنا.
+          في <strong>OTM</strong> نعمل باستمرار على تطوير خدماتنا لتلبية احتياجات السوق ومواكبة التطورات التقنية.
         </p>
         <ul className={styles.plansList}>
           {plans.map((plan, index) => (
@@ -28,7 +27,7 @@ export default function FuturePlans() {
               className={styles.planItem}
               style={{ animationDelay: `${index * 0.2}s` }}
             >
-               {plan}
+              {plan}
             </li>
           ))}
         </ul>

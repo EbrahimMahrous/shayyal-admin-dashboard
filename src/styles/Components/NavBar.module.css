@@ -2,6 +2,10 @@
   background: var(--main-color);
   color: white;
   font-family: var(--font-main);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--box-shadow);
 }
 
 .navbar {
@@ -18,11 +22,15 @@
 }
 
 .logo img {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
   cursor: pointer;
+  background-color: white; 
+  border-radius: 8px; 
+  padding: 2px 24px; 
 }
+
 
 .navLinks {
   display: flex;

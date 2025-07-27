@@ -41,6 +41,23 @@ let ordersBarChartInstance: Chart | null = null;
 let usersLineChartInstance: Chart | null = null;
 let orderStatusPieInstance: Chart | null = null;
 
+const StatCard = ({
+  title,
+  value,
+  onClick,
+}: {
+  title: string;
+  value: number;
+  onClick: () => void;
+}) => (
+  <div onClick={onClick} className={styles.card}>
+    <h2>{title}</h2>
+    <p>
+      <CountUp end={value} duration={1.5} separator="," />
+    </p>
+  </div>
+);
+
 export default function HomeAdmin() {
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
@@ -63,10 +80,13 @@ export default function HomeAdmin() {
 
   const token = localStorage.getItem("admin_token");
 
-  const headers = useMemo(() => ({
-    Authorization: `Bearer ${token}`,
-    Accept: "application/json",
-  }), [token]);
+  const headers = useMemo(
+    () => ({
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    }),
+    [token]
+  );
 
   const toggleMaintenance = () => {
     setMaintenanceMode((prev) => !prev);
@@ -85,7 +105,9 @@ export default function HomeAdmin() {
       const [usersRes, providersRes, ordersRes, itemsRes] = await Promise.all([
         fetch("https://otmove.online/api/v1/dashboard/customers", { headers }),
         fetch("https://otmove.online/api/v1/dashboard/drivers", { headers }),
-        fetch(`https://otmove.online/api/v1/dashboard/orders?${queryString}`, { headers }),
+        fetch(`https://otmove.online/api/v1/dashboard/orders?${queryString}`, {
+          headers,
+        }),
         fetch("https://otmove.online/api/v1/dashboard/items", { headers }),
       ]);
 
@@ -127,8 +149,11 @@ export default function HomeAdmin() {
     }
   };
 
-  const debouncedFetchStats = useMemo(() => debounce(fetchStats, 500), [fromDate, toDate, selectedCustomer, selectedProvider]);
-  
+  const debouncedFetchStats = useMemo(
+    () => debounce(fetchStats, 500),
+    [fromDate, toDate, selectedCustomer, selectedProvider]
+  );
+
   useEffect(() => {
     fetchStats().then(() => setLoading(false));
   }, []);
@@ -141,9 +166,15 @@ export default function HomeAdmin() {
   useEffect(() => {
     if (!stats.ordersPerMonth.length) return;
 
-    const ctxBar = (document.getElementById("ordersBarChart") as HTMLCanvasElement)?.getContext("2d");
-    const ctxLine = (document.getElementById("usersLineChart") as HTMLCanvasElement)?.getContext("2d");
-    const ctxPie = (document.getElementById("orderStatusPie") as HTMLCanvasElement)?.getContext("2d");
+    const ctxBar = (
+      document.getElementById("ordersBarChart") as HTMLCanvasElement
+    )?.getContext("2d");
+    const ctxLine = (
+      document.getElementById("usersLineChart") as HTMLCanvasElement
+    )?.getContext("2d");
+    const ctxPie = (
+      document.getElementById("orderStatusPie") as HTMLCanvasElement
+    )?.getContext("2d");
 
     ordersBarChartInstance?.destroy();
     usersLineChartInstance?.destroy();
@@ -154,11 +185,13 @@ export default function HomeAdmin() {
         type: "bar",
         data: {
           labels: stats.ordersPerMonth.map((item) => item.date),
-          datasets: [{
-            label: "الطلبات",
-            data: stats.ordersPerMonth.map((item) => item.count),
-            backgroundColor: "#b85a62",
-          }],
+          datasets: [
+            {
+              label: "الطلبات",
+              data: stats.ordersPerMonth.map((item) => item.count),
+              backgroundColor: "#E94E1B",
+            },
+          ],
         },
         options: {
           responsive: true,
@@ -175,12 +208,14 @@ export default function HomeAdmin() {
         type: "line",
         data: {
           labels: stats.ordersPerMonth.map((item) => item.date),
-          datasets: [{
-            label: "الطلبات اليومية",
-            data: stats.ordersPerMonth.map((item) => item.count),
-            borderColor: "#b85a62",
-            tension: 0.4,
-          }],
+          datasets: [
+            {
+              label: "الطلبات اليومية",
+              data: stats.ordersPerMonth.map((item) => item.count),
+              borderColor: "#E94E1B",
+              tension: 0.4,
+            },
+          ],
         },
         options: { responsive: true, plugins: { legend: { display: false } } },
       });
@@ -191,10 +226,18 @@ export default function HomeAdmin() {
         type: "pie",
         data: {
           labels: stats.orderStatus.map((s) => s.label),
-          datasets: [{
-            data: stats.orderStatus.map((s) => s.value),
-            backgroundColor: ["#dc747d", "#f0ad4e", "#5cb85c", "#5bc0de", "#292b2c"],
-          }],
+          datasets: [
+            {
+              data: stats.orderStatus.map((s) => s.value),
+              backgroundColor: [
+                "#E94E1B",
+                "#f0ad4e",
+                "#5cb85c",
+                "#5bc0de",
+                "#292b2c",
+              ],
+            },
+          ],
         },
         options: { responsive: true },
       });
@@ -212,10 +255,40 @@ export default function HomeAdmin() {
       <h1 className={styles.heading}>نورتنا يا بطل! لوحة التحكم أحلى بيك</h1>
 
       <div className={styles.filters}>
-        <label>من:<input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} /></label>
-        <label>إلى:<input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} /></label>
-        <label>العميل:<input type="text" value={selectedCustomer} onChange={(e) => setSelectedCustomer(e.target.value)} placeholder="ID العميل" /></label>
-        <label>مزود الخدمة:<input type="text" value={selectedProvider} onChange={(e) => setSelectedProvider(e.target.value)} placeholder="ID المزود" /></label>
+        <label>
+          من:
+          <input
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+          />
+        </label>
+        <label>
+          إلى:
+          <input
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+          />
+        </label>
+        <label>
+          العميل:
+          <input
+            type="text"
+            value={selectedCustomer}
+            onChange={(e) => setSelectedCustomer(e.target.value)}
+            placeholder="ID العميل"
+          />
+        </label>
+        <label>
+          مزود الخدمة:
+          <input
+            type="text"
+            value={selectedProvider}
+            onChange={(e) => setSelectedProvider(e.target.value)}
+            placeholder="ID المزود"
+          />
+        </label>
       </div>
 
       {loading ? (
@@ -223,10 +296,26 @@ export default function HomeAdmin() {
       ) : (
         <>
           <div className={styles.statsGrid}>
-            <StatCard title="عدد المستخدمين" value={stats.users} onClick={() => navigate("/admin/customers")} />
-            <StatCard title="عدد الطلبات" value={stats.orders} onClick={() => navigate("/admin/orders")} />
-            <StatCard title="مقدمو الخدمة" value={stats.providers} onClick={() => navigate("/admin/drivers")} />
-            <StatCard title="عدد العناصر" value={stats.items} onClick={() => navigate("/admin/items")} />
+            <StatCard
+              title="عدد المستخدمين"
+              value={stats.users}
+              onClick={() => navigate("/admin/customers")}
+            />
+            <StatCard
+              title="عدد الطلبات"
+              value={stats.orders}
+              onClick={() => navigate("/admin/orders")}
+            />
+            <StatCard
+              title="مقدمو الخدمة"
+              value={stats.providers}
+              onClick={() => navigate("/admin/drivers")}
+            />
+            <StatCard
+              title="عدد العناصر"
+              value={stats.items}
+              onClick={() => navigate("/admin/items")}
+            />
           </div>
 
           <div className={styles.charts_container}>
@@ -239,7 +328,9 @@ export default function HomeAdmin() {
               <canvas id="orderStatusPie" height="100"></canvas>
             </div>
             <div className={styles.chart_card}>
-              <h3 className={styles.subheading}>الطلبات اليومية بالرسم الخطي</h3>
+              <h3 className={styles.subheading}>
+                الطلبات اليومية بالرسم الخطي
+              </h3>
               <canvas id="usersLineChart" height="100"></canvas>
             </div>
           </div>
@@ -248,7 +339,9 @@ export default function HomeAdmin() {
             <h3 className={styles.subheading}>إجراءات سريعة</h3>
             <div className={styles.actionsGrid}>
               <button
-                className={`${styles.actionBtn} ${maintenanceMode ? styles.maintenanceOn : styles.maintenanceOff}`}
+                className={`${styles.actionBtn} ${
+                  maintenanceMode ? styles.maintenanceOn : styles.maintenanceOff
+                }`}
                 onClick={toggleMaintenance}
               >
                 {maintenanceMode ? "إيقاف وضع الصيانة" : "تفعيل وضع الصيانة"}
@@ -264,10 +357,3 @@ export default function HomeAdmin() {
     </div>
   );
 }
-
-const StatCard = ({ title, value, onClick }: { title: string; value: number; onClick: () => void }) => (
-  <div onClick={onClick} className={styles.card}>
-    <h2>{title}</h2>
-    <p><CountUp end={value} duration={1.5} separator="," /></p>
-  </div>
-);

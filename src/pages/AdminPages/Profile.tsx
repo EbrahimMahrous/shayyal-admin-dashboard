@@ -1,25 +1,18 @@
 import { useEffect, useState } from "react";
 import styles from "../../styles/Pages/Admin/Profile.module.css";
-
-// type Employee = {
-//   id: number;
-//   name: string;
-//   email: string;
-// };
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 export default function Profile() {
-  // const [employee, setEmployee] = useState<Employee | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const storedName = localStorage.getItem("admin_name") || "";
     const storedEmail = localStorage.getItem("admin_email") || "";
-    // setEmployee({ id: 4, name: storedName, email: storedEmail });
     setName(storedName);
     setEmail(storedEmail);
   }, []);
@@ -40,56 +33,70 @@ export default function Profile() {
 
       const data = await res.json();
       if (data.success) {
-        setMessage("✅ تم تحديث البيانات بنجاح");
         localStorage.setItem("admin_name", name);
         localStorage.setItem("admin_email", email);
+        toast.success(" تم تحديث البيانات بنجاح");
+      } else {
+        toast.error(" حدث خطأ أثناء التحديث");
       }
     } catch (err) {
       console.error(err);
-      setMessage("حدث خطأ أثناء التحديث");
+      toast.error(" حدث خطأ أثناء التحديث");
     }
   };
 
   const handlePasswordUpdate = async () => {
     if (newPassword !== confirmPassword) {
-      return setMessage("❌ تأكيد كلمة المرور غير متطابق");
+      toast.error(" تأكيد كلمة المرور غير متطابق");
+      return;
     }
 
-    try {
-      const res = await fetch(
-        "https://otmove.online/api/v1/dashboard/edit_password",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.admin_token}`,
-          },
-          body: JSON.stringify({
-            old_password: oldPassword,
-            password: newPassword,
-            password_confirmation: confirmPassword,
-          }),
-        }
-      );
+    const confirm = await Swal.fire({
+      title: "هل أنت متأكد؟",
+      text: "سيتم تغيير كلمة المرور الخاصة بك",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "نعم، غيّرها",
+      cancelButtonText: "إلغاء",
+    });
 
-      const data = await res.json();
-      if (data.success) {
-        setMessage("✅ تم تحديث كلمة المرور بنجاح");
-        setOldPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-      } else {
-        setMessage("❌ حدث خطأ أثناء تحديث كلمة المرور");
+    if (confirm.isConfirmed) {
+      try {
+        const res = await fetch(
+          "https://otmove.online/api/v1/dashboard/edit_password",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.admin_token}`,
+            },
+            body: JSON.stringify({
+              old_password: oldPassword,
+              password: newPassword,
+              password_confirmation: confirmPassword,
+            }),
+          }
+        );
+
+        const data = await res.json();
+        if (data.success) {
+          toast.success(" تم تحديث كلمة المرور بنجاح");
+          setOldPassword("");
+          setNewPassword("");
+          setConfirmPassword("");
+        } else {
+          toast.error(" حدث خطأ أثناء تحديث كلمة المرور");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error(" حدث خطأ أثناء تحديث كلمة المرور");
       }
-    } catch (err) {
-      console.error(err);
-      setMessage("❌ حدث خطأ أثناء تحديث كلمة المرور");
     }
   };
 
   return (
     <div className={styles.profileContainer}>
-      <h2 className={styles.title}>الملف الشخصي</h2>
+      <h2 className={styles.title}>تحديث الملف الشخصي</h2>
 
       <div className={styles.card}>
         <h3>تعديل البيانات</h3>
@@ -130,8 +137,6 @@ export default function Profile() {
         />
         <button onClick={handlePasswordUpdate}>تحديث كلمة المرور</button>
       </div>
-
-      {message && <div className={styles.success}>{message}</div>}
     </div>
   );
 }

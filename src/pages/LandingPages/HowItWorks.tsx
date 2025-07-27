@@ -1,14 +1,12 @@
 // ** Style
 import styles from "../../styles/Pages/LandingPage/HowItWorks.module.css";
-// ** Assets
-// ** Hooks
 
 const steps = [
-  "يقوم العميل بإنشاء طلب جديد من خلال التطبيق بسهولة.",
-  "يتم إرسال إشعارات فورية للمزودين الأقرب للعميل.",
-  "يختار المزود تنفيذ الطلب ويحدد موعد الخدمة.",
-  "يمكن للمسؤول متابعة الطلب عبر لوحة التحكم التفاعلية.",
-  "بعد إتمام الخدمة، يُقيّم العميل التجربة ويتم إغلاق الطلب.",
+  "يقوم العميل بإنشاء طلب جديد من خلال تطبيق OTM بسهولة.",
+  "يتم إرسال إشعارات فورية إلى أقرب السائقين المتاحين.",
+  "يختار السائق تنفيذ الطلب ويحدد موعد الخدمة المناسب.",
+  "يمكن للمسؤول متابعة الطلبات لحظيًا من لوحة التحكم.",
+  "بعد إتمام الخدمة، يقيّم العميل التجربة ويتم إغلاق الطلب.",
 ];
 
 export default function HowItWorks() {
@@ -16,7 +14,7 @@ export default function HowItWorks() {
     <section className={styles.howSection}>
       <div className={styles.container}>
         <h2 className={styles.title}>
-          كيف يعمل تطبيق <span>شيّال؟</span>
+          كيف يعمل تطبيق <span>OTM؟</span>
         </h2>
         <div className={styles.steps}>
           {steps.map((step, index) => (

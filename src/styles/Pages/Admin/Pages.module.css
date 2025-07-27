@@ -75,9 +75,29 @@
 .button:hover {
   background-color: var(--main-color-dark);
 }
-.message {
-  margin-top: 15px;
-  text-align: center;
-  color: green;
-  font-weight: bold;
+/* swal */
+.swal_popup {
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--box-shadow) !important;
+  background-color: var(--bg-color) !important;
+}
+.swal_title {
+  color: var(--text-color) !important;
+}
+.swal_confirm_btn {
+  background-color: var(--main-color) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: var(--border-radius) !important;
+  padding: 0.5rem 1.5rem !important;
+  font-weight: bold !important;
+}
+
+.swal_cancel_btn {
+  background-color: var(--secondary-color) !important;
+  color: var(--text-light) !important;
+  border: none !important;
+  border-radius: var(--border-radius) !important;
+  padding: 0.5rem 1.5rem !important;
+  font-weight: bold !important;
 }
